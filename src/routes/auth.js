@@ -19,7 +19,7 @@ router.post('/login', async ctx => {
       ctx.login(user);
       ctx.redirect('/');
     } else {
-      ctx.render('login.pug');
+      ctx.redirect('/auth/login');
     }
   })(ctx);
 });

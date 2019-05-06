@@ -12,8 +12,8 @@ console.log('NODE_ENV: ' + process.env.NODE_ENV);
 module.exports = {
   mode: process.env.NODE_ENV,
   entry: {
-    'index': './src/components/File/index.js',
-    'login': './src/components/Login/index.js'
+    'index': './components/File/index.js',
+    'login': './components/Login/index.js'
   },
   output: {
     filename: '[name].[hash].js',
