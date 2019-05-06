@@ -1,0 +1,11 @@
+doctype html
+html(lang="en")
+  head
+    title test
+  body
+    #react-container
+      p #{text}
+    script.
+      const csrf_token = "#{csrf_token}";
+      const files = !{JSON.stringify(files)}
+    script(src="/js/__SCRIPT__").
