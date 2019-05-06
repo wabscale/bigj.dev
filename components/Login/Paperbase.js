@@ -142,7 +142,7 @@ const styles = {
   mainContent: {
     flex: 1,
     padding: '48px 36px 0',
-    background: '#eaeff1',
+    // background: '#eaeff1',
   },
 };
 

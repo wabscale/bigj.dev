@@ -18,7 +18,7 @@ let theme = createMuiTheme({
   },
   palette: {
     type: 'dark',
-    background: '#280680',
+    // background: '#280680',
     primary: {
       light: '#63ccff',
       main: '#009be5',
@@ -146,7 +146,7 @@ const styles = {
   mainContent: {
     flex: 1,
     padding: '48px 36px 0',
-    background: '#494949',
+    // background: '#494949',
   },
 };
 
