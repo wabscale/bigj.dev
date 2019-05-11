@@ -1,6 +1,7 @@
 // const webpack = require('webpack')
 const fs = require('fs');
 const path = require('path');
+const webpack = require('webpack');
 
 OUT_DIR = 'src/';
 
@@ -12,8 +13,7 @@ console.log('NODE_ENV: ' + process.env.NODE_ENV);
 module.exports = {
   mode: process.env.NODE_ENV,
   entry: {
-    'index': './components/File/index.js',
-    'login': './components/Login/index.js'
+    'index': './components/index.js',
   },
   output: {
     filename: '[name].[hash].js',
@@ -58,6 +58,9 @@ module.exports = {
     ],
   },
   plugins: [
+    new webpack.DefinePlugin({
+      APIHOST: JSON.stringify(process.env.APIHOST || 'http://localhost:8080'),
+    }),
     function () {
       this.plugin('done', async stats => {
         await new Promise((resolve, reject) => {

@@ -1,8 +1,12 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {createMuiTheme, MuiThemeProvider, withStyles} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import Content from './Content'
+import Hidden from '@material-ui/core/Hidden';
+import Navigator from './Navigator';
+import FileContent from './File/FileContent';
+import LoginContent from './Login/LoginContent';
+import Header from './Header';
 
 let theme = createMuiTheme({
   typography: {
@@ -15,11 +19,12 @@ let theme = createMuiTheme({
   },
   palette: {
     type: 'dark',
-    // primary: {
-    //   light: '#63ccff',
-    //   main: '#009be5',
-    //   dark: '#006db3',
-    // },
+    // background: '#280680',
+    primary: {
+      light: '#63ccff',
+      main: '#009be5',
+      dark: '#006db3',
+    },
   },
   shape: {
     borderRadius: 8,
@@ -142,21 +147,74 @@ const styles = {
   mainContent: {
     flex: 1,
     padding: '48px 36px 0',
-    // background: '#eaeff1',
+    // background: '#494949',
   },
 };
 
 class Paperbase extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      mobileOpen: false,
+      active: 'View',
+    };
+
+    this.handleDrawerToggle = this.handleDrawerToggle.bind(this);
+    this.switchView = this.switchView.bind(this);
+  }
+
+  handleDrawerToggle = () => {
+    this.setState(state => ({mobileOpen: !state.mobileOpen}));
+  };
+
+  switchView(id) {
+    if (id === "Sign Out") {
+      document.location.href = "/auth/logout";
+    }
+    this.setState({
+      active: id,
+    });
+  }
+
   render() {
-    const {classes, api} = this.props;
+    const {classes} = this.props;
+    const {active} = this.state;
 
     return (
       <MuiThemeProvider theme={theme}>
         <div className={classes.root}>
           <CssBaseline/>
+          <nav className={classes.drawer}>
+            <Hidden smUp implementation="js">
+              <Navigator
+                PaperProps={{style: {width: drawerWidth}}}
+                variant="temporary"
+                open={this.state.mobileOpen}
+                onDrawerToggle={this.handleDrawerToggle}
+                switchView={this.switchView}
+                active={this.state.active}
+              />
+            </Hidden>
+            <Hidden xsDown implementation="css">
+              <Navigator
+                PaperProps={{style: {width: drawerWidth}}}
+                switchView={this.switchView}
+                active={this.state.active}
+              />
+            </Hidden>
+          </nav>
           <div className={classes.appContent}>
+            <Header onDrawerToggle={this.handleDrawerToggle}/>
             <main className={classes.mainContent}>
-              <Content api={api}/>
+                {
+                  active === "View" ? <FileContent
+                      switchView={this.switchView}
+                    /> :
+                    active === "Sign In" ? <LoginContent
+                        switchView={this.switchView}
+                      /> :
+                      <Fragment/>
+                }
             </main>
           </div>
         </div>

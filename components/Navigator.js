@@ -12,17 +12,24 @@ import HomeIcon from '@material-ui/icons/Home';
 import FolderIcon from '@material-ui/icons/Folder';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faSignOutAlt} from "@fortawesome/free-solid-svg-icons/faSignOutAlt";
+import {faSignInAlt} from "@fortawesome/free-solid-svg-icons/faSignInAlt";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 
 const categories = [
   {
-    id: 'Develop',
+    id: 'Files',
     children: [
       {id: 'View', icon: <FolderIcon/>},
-      {id: 'Sign Out', icon: <FontAwesomeIcon icon={faSignOutAlt}/>}
     ],
   },
+  {
+    id: "Auth",
+    children: [
+      {id: "Sign In", icon: <FontAwesomeIcon icon={faSignInAlt} />},
+      {id: 'Sign Out', icon: <FontAwesomeIcon icon={faSignOutAlt}/>}
+    ],
+  }
 ];
 
 const styles = theme => ({
@@ -74,7 +81,7 @@ const styles = theme => ({
 });
 
 function Navigator(props) {
-  const {classes, onDrawerToggle, onSwitchView, api, ...other} = props;
+  const {classes, onDrawerToggle, switchView, api, ...other} = props;
 
   return (
     <Drawer variant="permanent" {...other} onClose={onDrawerToggle}>
@@ -124,7 +131,10 @@ function Navigator(props) {
                   classes.itemActionable,
                   props.active && classes.itemActiveItem,
                 )}
-                onClick={() => onSwitchView(childId)}
+                onClick={() => {
+                  switchView(childId);
+                  onDrawerToggle();
+                }}
               >
                 <ListItemIcon>{icon}</ListItemIcon>
                 <ListItemText

@@ -14,6 +14,7 @@ import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import Switch from '@material-ui/core/Switch';
 import Link from '@material-ui/core/Link';
 import PropTypes from "prop-types";
+import Grow from '@material-ui/core/Grow';
 
 const styles = theme => ({
   paper: {
@@ -100,87 +101,95 @@ class File extends PureComponent {
   }
 
   render() {
-    // if (this.props.file.fileId !== this.state.fileId) this.state = {...this.props.file};
-    const {classes, api} = this.props;
-    const {fileId, filename, isPublic, size, display} = this.state;
+    // if (this.props.file.fileID !== this.state.fileID) this.state = {...this.props.file};
+    const {classes, index} = this.props;
+    const {fileId: fileID, filename, isPublic, size, display} = this.state;
 
     console.log("file rerender");
 
     return (
-      <Grid item key={`file_${fileId}`} style={{display: display}}>
-        <Paper className={classes.paper}>
-          <AppBar className={classes.searchBar} position="static" color="default" elevation={0}>
-            <Toolbar>
-              <Grid
-                container
-                spacing={16}
-                alignItems="center"
-                key={`file_${fileId}_toolbar`}
-              >
-                <Grid item xs key={`file_${fileId}_filename`}>
-                  <TextField
-                    fullWidth
-                    value={filename}
-                    InputProps={{
-                      disableUnderline: true,
-                      className: classes.searchInput,
-                    }}
-                    onChange={event => this.setState({
-                      filename: event.target.value,
-                    })}
-                    onKeyPress={event => event.key === "Enter" ? this.update() : {}}
-                  />
-                </Grid>
-                <Grid item key={`file_${fileId}_save`}>
-                  <Tooltip title="Save">
-                    <IconButton color="default" onClick={this.update}>
-                      <SaveIcon
-                        classes={{root: classes.block}}
-                        color="inherit"
-                      />
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
-                <Grid item key={`file_${fileId}_download`}>
-                  <Tooltip title="Download">
-                    <IconButton href={`/f/${filename}`}>
-                      <CloudDownloadIcon
-                        classes={{root: classes.block}}
-                        color="inherit"
-                      />
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
-                <Grid item key={`file_${fileId}_public`}>
-                  <Tooltip title={isPublic ? "Public" : "Private"}>
-                    <Switch
-                      checked={isPublic}
-                      onChange={this.togglePublic}
-                      color="primary"
+      <Grid item key={`file_${fileID}`} style={{display: display}}>
+        <Grow
+          in={true}
+          style={{transformOrigin: '0 0 0'}}
+          timeout={250 + (index * 250)}
+          key={`file_${fileID}_grow`}
+        >
+          <Paper className={classes.paper}>
+            <AppBar className={classes.searchBar} position="static" color="default" elevation={0}>
+              <Toolbar>
+                <Grid
+                  container
+                  spacing={16}
+                  alignItems="center"
+                  key={`file_${fileID}_toolbar`}
+                >
+                  <Grid item xs key={`file_${fileID}_filename`}>
+                    <TextField
+                      fullWidth
+                      value={filename}
+                      InputProps={{
+                        disableUnderline: true,
+                        className: classes.searchInput,
+                      }}
+                      onChange={event => this.setState({
+                        filename: event.target.value,
+                      })}
+                      onKeyPress={event => event.key === "Enter" ? this.update() : {}}
                     />
-                  </Tooltip>
+                  </Grid>
+                  <Grid item key={`file_${fileID}_save`}>
+                    <Tooltip title="Save">
+                      <IconButton color="default" onClick={this.update}>
+                        <SaveIcon
+                          classes={{root: classes.block}}
+                          color="inherit"
+                        />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item key={`file_${fileID}_download`}>
+                    <Tooltip title="Download">
+                      <IconButton href={`/f/${filename}`}>
+                        <CloudDownloadIcon
+                          classes={{root: classes.block}}
+                          color="inherit"
+                        />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item key={`file_${fileID}_public`}>
+                    <Tooltip title={isPublic ? "Public" : "Private"}>
+                      <Switch
+                        checked={isPublic}
+                        onChange={this.togglePublic}
+                        color="primary"
+                      />
+                    </Tooltip>
+                  </Grid>
+                  <Grid item key={`file_${fileID}_delete`}>
+                    <Tooltip title="Delete">
+                      <IconButton onClick={async () => {
+                        this.setState({
+                          display: 'none',
+                        });
+                        this.props.delete();
+                      }}>
+                        <DeleteIcon classes={{root: classes.block}} color="secondary"/>
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
                 </Grid>
-                <Grid item key={`file_${fileId}_delete`}>
-                  <Tooltip title="Delete">
-                    <IconButton onClick={async () => {
-                      this.setState({
-                        display: 'none',
-                      });
-                      this.props.delete();
-                    }}>
-                      <DeleteIcon classes={{root: classes.block}} color="secondary"/>
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
-              </Grid>
-            </Toolbar>
-          </AppBar>
-          <div className={classes.root}>
-            <FileExpand heading="History" api={api} fileId={fileId} onExpand={this.getHistory}/>
-            <FileExpand heading="One Time Password" api={api} fileId={fileId} onExpand={this.getOtp}/>
-            <FileExpand heading="Details" fileId={fileId} onExpand={() => {}} content={`Size: ${size}`}/>
-          </div>
-        </Paper>
+              </Toolbar>
+            </AppBar>
+            <div className={classes.root}>
+              <FileExpand heading="History" fileId={fileID} onExpand={this.getHistory}/>
+              <FileExpand heading="One Time Password" fileId={fileID} onExpand={this.getOtp}/>
+              <FileExpand heading="Details" fileId={fileID} onExpand={() => {
+              }} content={`Size: ${size}`}/>
+            </div>
+          </Paper>
+        </Grow>
       </Grid>
     );
   }

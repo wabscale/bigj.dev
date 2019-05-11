@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+  db:
+    image: mariadb:10.4
+    ports:
+      - "127.0.0.1:3306:3306"
+    environment:
+      - "MYSQL_ROOT_PASSWORD=password"
+      - "MYSQL_DATABASE=db"
+    labels:
+      - "traefik.enable=false"

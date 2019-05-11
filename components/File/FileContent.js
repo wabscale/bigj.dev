@@ -6,19 +6,34 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import {withStyles} from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
-import File from './File';
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import RefreshIcon from '@material-ui/icons/Refresh';
 import FormControl from "@material-ui/core/FormControl";
 import IconButton from '@material-ui/core/IconButton';
 import Input from '@material-ui/core/Input';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import {Query} from 'react-apollo';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Typography from '@material-ui/core/Typography';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+// import {faFrown} from '@fortawesome/react-fontawesome';
+import {faFrown} from '@fortawesome/free-solid-svg-icons/faFrown';
+
+
+
+import {GET_FILE, GET_FILES} from '../queries';
+import File from './File';
+import Button from "@material-ui/core/es/Button/Button";
 
 const styles = theme => ({
+  root: {
+    flexGrow: 1,
+  },
   paper: {
     maxWidth: 936,
     margin: 'auto',
     overflow: 'hidden',
+    flexGrow: 1,
   },
   searchBar: {
     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
@@ -34,6 +49,15 @@ const styles = theme => ({
   },
   contentWrapper: {
     margin: '40px 16px',
+  },
+  progress: {
+    margin: theme.spacing.unit * 2,
+  },
+  typography: {
+    margin: theme.spacing.unit * 2,
+  },
+  button: {
+    margin: theme.spacing.unit,
   },
 });
 
@@ -87,11 +111,10 @@ class SearchBar extends PureComponent {
   }
 }
 
-class Content extends React.PureComponent {
+class FileContent extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      files: files,
       searchTerm: "",
     };
     this.deleteFile = this.deleteFile.bind(this);
@@ -134,15 +157,18 @@ class Content extends React.PureComponent {
   };
 
   render() {
-    const {classes, api} = this.props;
-    const {files = [], searchTerm} = this.state;
-
-    const displayFiles = files.filter(file => (
-      file.filename.toLowerCase().includes(searchTerm.toLowerCase())
-    ));
+    const {classes, switchView} = this.props;
+    const {searchTerm} = this.state;
 
     return (
-      <Grid container spacing={24}>
+      <Grid
+        container
+        spacing={24}
+        direction="row"
+        justify="center"
+        alignItems="center"
+        className={classes.root}
+      >
         <Grid item xs={12} key="tool-bar">
           <Paper className={classes.paper}>
             <AppBar className={classes.searchBar} position="static" color="default" elevation={0}>
@@ -180,21 +206,46 @@ class Content extends React.PureComponent {
             </AppBar>
           </Paper>
         </Grid>
-        {displayFiles.map((file) => (
-          <File
-            api={api}
-            file={file}
-            delete={() => this.deleteFile(file)}
-            key={`file_${file.fileId}_file`}
-          />
-        ))}
+        <Query query={GET_FILES}>
+          {({data, loading, error}) => {
+            if (loading) return <Grid item xs={12}><CircularProgress className={classes.progress}/></Grid>;
+            if (error) {
+              setTimeout(() => switchView('Sign In'), 250);
+              return (
+                <Fragment/>
+              );
+            }
+            const {files} = data;
+            const displayFiles = files.filter(file => (
+              file.filename.toLowerCase().includes(searchTerm.toLowerCase())
+            ));
+            if (displayFiles.length === 0)
+              return (
+                <Paper className={classes.paper}>
+                  <Typography variant="h5" className={classes.typography}>
+                    No Files to Show <FontAwesomeIcon icon={faFrown}/>
+                  </Typography>
+                </Paper>
+              );
+            console.log(data)
+
+            return displayFiles.map((file, index) => (
+              <File
+                key={`file_${file.fileID}_file`}
+                file={file}
+                delete={() => this.deleteFile(file)}
+                index={index}
+              />
+            ));
+          }}
+        </Query>
       </Grid>
     );
   }
 }
 
-Content.propTypes = {
+FileContent.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Content);
+export default withStyles(styles)(FileContent);

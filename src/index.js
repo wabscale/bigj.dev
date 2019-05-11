@@ -1,24 +1,12 @@
 const Koa = require('koa');
-const bodyParser = require('koa-bodyparser');
-const session = require('koa-session');
-const passport = require('koa-passport');
 const koaviews = require('koa-views');
-const CSRF = require('koa-csrf');
 const serve = require('koa-static');
-const convert = require('koa-convert');
+const logger = require('koa-logger');
+const cors = require('koa2-cors');
+const helmet = require('koa-helmet');
 
 const app = new Koa();
 const PORT = process.env.PORT || 5000;
-
-// sessions
-app.keys = ['DEBUG'];
-app.use(convert(session(app)));
-
-// body parser
-app.use(bodyParser({
-  multipart: true,
-  urlencode: true,
-}));
 
 app.use(serve('src/static'));
 
@@ -30,27 +18,38 @@ app.use(koaviews(__dirname + '/views', {
   }
 }));
 
-
-app.use(new CSRF({
-  invalidTokenMessage: 'Invalid CSRF token',
-  invalidTokenStatusCode: 403,
-  excludedMethods: ['GET', 'HEAD', 'OPTIONS'],
-  disableQuery: false
-}));
-
-
-// authentication
-require('./auth');
-app.use(passport.initialize());
-app.use(passport.session());
-
 // routes
 app.use(require('./routes/index').routes());
-app.use(require('./routes/auth').routes());
-app.use(require('./routes/api').routes());
+// app.use(require('./routes/auth').routes());
 
 // logging
-app.use(require('./logger'));
+app.use(logger());
+
+// security
+app.use(cors({
+  origin: 'api.localhost'
+}));
+app.use(helmet());
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: [
+      "'self'",
+    ],
+    styleSrc: [
+      "'self'",
+    ],
+    scriptSrc: [
+      "'self'",
+      // process.env.NODE_ENV === 'development' ? "'unsafe-eval'" : "",
+    ],
+    fontSrc: [
+      'fonts.gstatic.com'
+    ],
+    connectSrc: [
+      process.env.APIHOST || 'http://localhost8080/',
+    ]
+  }
+}));
 
 // server
 const server = app.listen(PORT, () => {
