@@ -1,5 +1,6 @@
 const db = require('../models');
 const bcrypt = require('bcryptjs');
+var crypto = require("crypto");
 
 
 module.exports = {
@@ -21,6 +22,20 @@ module.exports = {
     let values = await db.Config.findAll({where: {key,}});
     return values.length >= 1 ? values : null;
   },
+  getDownloadHistory: async (fileID) => (
+    await db.DownloadHistory.findAll({
+      where: {fileID},
+      attributes: ['fileID', 'ipAddress', 'time']
+    })
+  ),
+  getOTP: async (fileID) => {
+    const otp = crypto.randomBytes(8).toString('hex');
+    const file = await db.File.findAll({where:{id:fileID}});
+    await db.OTP.create({otp, fileID});
+    return {
+      otp: `http://f.bigj.dev/f/${file[0].filename}?otp=${otp}`,
+    };
+  },
 
   // add
   addFile: async ({filename, isPublic = false, size = null}) => (
@@ -40,7 +55,8 @@ module.exports = {
   ),
 
   // update
-  updateFile: async (file) => (
-    await db.File.update({...file}, {where: {id: file.id}})
-  ),
+  updateFile: async (file) => {
+    await db.File.update({...file}, {where: {id: file.fileID}});
+    return file;
+  },
 };
