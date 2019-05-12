@@ -16,14 +16,9 @@ import {Query} from 'react-apollo';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from '@material-ui/core/Typography';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-// import {faFrown} from '@fortawesome/react-fontawesome';
-import {faFrown} from '@fortawesome/free-solid-svg-icons/faFrown';
-
-
 
 import {GET_FILE, GET_FILES} from '../queries';
 import File from './File';
-import Button from "@material-ui/core/es/Button/Button";
 
 const styles = theme => ({
   root: {
@@ -52,6 +47,7 @@ const styles = theme => ({
   },
   progress: {
     margin: theme.spacing.unit * 2,
+    align: 'center',
   },
   typography: {
     margin: theme.spacing.unit * 2,
@@ -116,6 +112,7 @@ class FileContent extends React.PureComponent {
     super(props);
     this.state = {
       searchTerm: "",
+      files: [],
     };
     this.deleteFile = this.deleteFile.bind(this);
     this.uploadFile = this.uploadFile.bind(this);
@@ -161,85 +158,100 @@ class FileContent extends React.PureComponent {
     const {searchTerm} = this.state;
 
     return (
-      <Grid
-        container
-        spacing={24}
-        direction="row"
-        justify="center"
-        alignItems="center"
-        className={classes.root}
-      >
-        <Grid item xs={12} key="tool-bar">
-          <Paper className={classes.paper}>
-            <AppBar className={classes.searchBar} position="static" color="default" elevation={0}>
-              <Toolbar>
-                <Grid container spacing={16} alignItems="center">
-                  <Grid item xs={12} key="searchBar">
-                    <SearchBar classes={classes} onChange={searchTerm => {
-                      this.setState({searchTerm: searchTerm});
-                    }}/>
+      //<AutoSizer>
+      //   {({height, width}) => (
+      <Fragment>
+        <Grid
+          container
+          spacing={24}
+          direction="row"
+          justify="center"
+          alignItems="center"
+          className={classes.root}
+        >
+          <Grid item xs={12} key="tool-bar">
+            <Paper className={classes.paper}>
+              <AppBar className={classes.searchBar} position="static" color="default" elevation={0}>
+                <Toolbar>
+                  <Grid container spacing={16} alignItems="center">
+                    <Grid item xs={12} key="searchBar">
+                      <SearchBar classes={classes} onChange={searchTerm => {
+                        this.setState({searchTerm: searchTerm});
+                      }}/>
+                    </Grid>
                   </Grid>
-                </Grid>
-                <Grid item key="uploadButton">
-                  <Fragment>
-                    <input
-                      accept="*"
-                      className={classes.input}
-                      id="icon-button-file"
-                      onChange={this.uploadFile}
-                      type="file"
-                      hidden
-                    />
-                    <label htmlFor="icon-button-file">
-                      <IconButton variant="contained" className={classes.addUser} component="span">
-                        <CloudUploadIcon/>
-                      </IconButton>
-                    </label>
-                  </Fragment>
-                </Grid>
-                <Grid item key="refreshButton">
-                  <IconButton onClick={this.update}>
-                    <RefreshIcon/>
-                  </IconButton>
-                </Grid>
-              </Toolbar>
-            </AppBar>
-          </Paper>
-        </Grid>
-        <Query query={GET_FILES}>
-          {({data, loading, error}) => {
-            if (loading) return <Grid item xs={12}><CircularProgress className={classes.progress}/></Grid>;
-            if (error) {
-              setTimeout(() => switchView('Sign In'), 250);
-              return (
-                <Fragment/>
-              );
-            }
-            const {files} = data;
-            const displayFiles = files.filter(file => (
-              file.filename.toLowerCase().includes(searchTerm.toLowerCase())
-            ));
-            if (displayFiles.length === 0)
-              return (
-                <Paper className={classes.paper}>
-                  <Typography variant="h5" className={classes.typography}>
-                    No Files to Show <FontAwesomeIcon icon={faFrown}/>
-                  </Typography>
-                </Paper>
-              );
-            console.log(data)
+                  <Grid item key="uploadButton">
+                    <Fragment>
+                      <input
+                        accept="*"
+                        className={classes.input}
+                        id="icon-button-file"
+                        onChange={this.uploadFile}
+                        type="file"
+                        hidden
+                      />
+                      <label htmlFor="icon-button-file">
+                        <IconButton variant="contained" className={classes.addUser} component="span">
+                          <CloudUploadIcon/>
+                        </IconButton>
+                      </label>
+                    </Fragment>
+                  </Grid>
+                  <Grid item key="refreshButton">
+                    <IconButton onClick={this.update}>
+                      <RefreshIcon/>
+                    </IconButton>
+                  </Grid>
+                </Toolbar>
+              </AppBar>
+            </Paper>
+          </Grid>
+          <Query query={GET_FILES}>
+            {({data, loading, error}) => {
+              if (loading)
+                return (
+                  <Grid item xs={12}>
+                    <CircularProgress className={classes.progress}/>
+                  </Grid>
+                );
+              if (error) {
+                setTimeout(() => switchView('Sign In'), 250);
+                return (
+                  <Fragment/>
+                );
+              }
 
-            return displayFiles.map((file, index) => (
-              <File
-                key={`file_${file.fileID}_file`}
-                file={file}
-                delete={() => this.deleteFile(file)}
-                index={index}
-              />
-            ));
-          }}
-        </Query>
-      </Grid>
+              const {files} = data;
+
+              // const displayFiles = files.filter(file => (
+              //   file.filename.toLowerCase().includes(searchTerm.toLowerCase())
+              // ));
+
+              // if (displayFiles.length === 0)
+              //   return (
+              //     <Paper className={classes.paper}>
+              //       <Typography variant="h5" className={classes.typography}>
+              //         No Files to Show <FontAwesomeIcon icon={faFrown}/>
+              //       </Typography>
+              //     </Paper>
+              //   );
+              // console.log(displayFiles);
+
+              this.state.files = files.map((file, index) => (
+                <Grid item key={`file_${file.fileID}`}>
+                  <File
+                    key={`file_${file.fileID}_file`}
+                    file={file}
+                    delete={() => this.deleteFile(file)}
+                    index={index}
+                  />
+                </Grid>
+              ));
+              return this.state.files;
+            }}
+          </Query>
+        </Grid>
+      </Fragment>
     );
   }
 }

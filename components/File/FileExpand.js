@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
@@ -6,6 +6,8 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {withStyles} from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
+import {Query} from 'react-apollo';
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const styles = theme => ({
   root: {
@@ -18,28 +20,34 @@ const styles = theme => ({
 });
 
 class FileExpand extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      content: props.content,
-      expanded: false
-    };
-  }
+  state = {
+    expanded: false
+  };
 
   render() {
-    const {classes} = this.props;
+    const {classes, query, args, heading, reshape} = this.props;
+    const {expanded} = this.state;
+    // console.log(args);
 
     return (
-      <ExpansionPanel onChange={() => this.setState({
-        expanded: !this.state.expanded,
-      })}>
-        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>} onClick={this.props.onExpand.bind(this)}>
-          <Typography className={classes.heading}>{this.props.heading}</Typography>
+      <ExpansionPanel onChange={() => this.setState({expanded: !expanded})}>
+        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+          <Typography className={classes.heading}>{heading}</Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
-          <Typography>
-            {this.state.content}
-          </Typography>
+          {
+            expanded
+              ? <Query query={query} variables={args}>
+                {({data, loading, error}) => {
+                  if (loading)
+                    return <CircularProgress className={classes.progress}/>;
+                  if (error)
+                    return <Fragment/>;
+                  return reshape(data);
+                }}
+              </Query>
+              : <Fragment/>
+          }
         </ExpansionPanelDetails>
       </ExpansionPanel>
     );

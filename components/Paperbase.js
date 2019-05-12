@@ -209,9 +209,11 @@ class Paperbase extends React.Component {
                 {
                   active === "View" ? <FileContent
                       switchView={this.switchView}
+                      style={{height:"100%",width:"100%"}}
                     /> :
                     active === "Sign In" ? <LoginContent
                         switchView={this.switchView}
+                        style={{height:"100%",width:"100%"}}
                       /> :
                       <Fragment/>
                 }

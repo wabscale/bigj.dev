@@ -82,7 +82,7 @@ class LoginContent extends React.PureComponent {
       variables: {username, password}
     }).then(({data}) => {
       localStorage.setItem('token', data['login']['token']);
-      // switchView("view");
+      switchView("View");
     }).catch(e => {
       console.log(e);
       this.setState({unauth: true})

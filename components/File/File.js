@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react';
+import React, {PureComponent, Fragment} from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Paper from '@material-ui/core/Paper';
@@ -15,6 +15,8 @@ import Switch from '@material-ui/core/Switch';
 import Link from '@material-ui/core/Link';
 import PropTypes from "prop-types";
 import Grow from '@material-ui/core/Grow';
+import {withApollo} from 'react-apollo';
+import {GET_DOWNLOAD_HISTORY, GET_OTP, GET_FILE_SIZE, UPDATE_FILE} from "../queries";
 
 const styles = theme => ({
   paper: {
@@ -49,6 +51,16 @@ class File extends PureComponent {
 
     this.togglePublic = this.togglePublic.bind(this);
     this.update = this.update.bind(this);
+    // console.log(props.client);
+  }
+
+  async update() {
+    const {fileID, filename, isPublic} = this.state;
+    const {client} = this.props;
+    await client.mutate({
+      mutation: UPDATE_FILE,
+      variables: {fileID, filename, isPublic},
+    });
   }
 
   togglePublic() {
@@ -57,65 +69,20 @@ class File extends PureComponent {
     }, this.update);
   }
 
-  update() {
-    const {api} = this.props;
-    api.post(`/api/files/${this.state.fileId}`, {
-      action: "update",
-      ...this.state,
-    }).then(res => {
-      this.setState({
-        ...res.data.data,
-      });
-    });
-  }
-
-  getOtp() {
-    const {fileId, api} = this.props;
-    api.post(`/api/files/${fileId}`, {
-      action: 'getOtp',
-    }).then(res => this.setState({
-      content: (
-        <Link
-          href={res.data.data}
-          color="primary"
-        >
-          {res.data.data}
-        </Link>
-      ),
-    }));
-  }
-
-  getHistory() {
-    const {fileId, api} = this.props;
-    api.post(`/api/files/${fileId}`, {
-      action: 'getDownloads',
-    }).then(res => this.setState({
-      content: res.data.data.map(i => (
-        <>
-          {i}
-          <br/>
-        </>
-      )),
-      expanded: !this.state.expanded,
-    }));
-  }
-
   render() {
-    // if (this.props.file.fileID !== this.state.fileID) this.state = {...this.props.file};
     const {classes, index} = this.props;
-    const {fileId: fileID, filename, isPublic, size, display} = this.state;
-
-    console.log("file rerender");
+    const {fileID, filename, isPublic} = this.state;
+    console.log("render file");
 
     return (
-      <Grid item key={`file_${fileID}`} style={{display: display}}>
-        <Grow
-          in={true}
-          style={{transformOrigin: '0 0 0'}}
-          timeout={250 + (index * 250)}
-          key={`file_${fileID}_grow`}
-        >
-          <Paper className={classes.paper}>
+      <Grow
+        in={true}
+        style={{transformOrigin: '0 0 0'}}
+        timeout={250 + (index * 250)}
+        key={`file_${fileID}_grow`}
+      >
+        <Paper className={classes.paper}>
+          <Fragment>
             <AppBar className={classes.searchBar} position="static" color="default" elevation={0}>
               <Toolbar>
                 <Grid
@@ -135,12 +102,12 @@ class File extends PureComponent {
                       onChange={event => this.setState({
                         filename: event.target.value,
                       })}
-                      onKeyPress={event => event.key === "Enter" ? this.update() : {}}
+                      onKeyPress={event => event.key === "Enter" ? this.update(client) : {}}
                     />
                   </Grid>
                   <Grid item key={`file_${fileID}_save`}>
                     <Tooltip title="Save">
-                      <IconButton color="default" onClick={this.update}>
+                      <IconButton color="default" onClick={() => this.update(client)}>
                         <SaveIcon
                           classes={{root: classes.block}}
                           color="inherit"
@@ -183,14 +150,36 @@ class File extends PureComponent {
               </Toolbar>
             </AppBar>
             <div className={classes.root}>
-              <FileExpand heading="History" fileId={fileID} onExpand={this.getHistory}/>
-              <FileExpand heading="One Time Password" fileId={fileID} onExpand={this.getOtp}/>
-              <FileExpand heading="Details" fileId={fileID} onExpand={() => {
-              }} content={`Size: ${size}`}/>
+              <FileExpand
+                heading="History"
+                query={GET_DOWNLOAD_HISTORY}
+                args={{fileID}}
+                reshape={data => (
+                  data.fileHistory.map(({ipAddress, time}) => (
+                    ipAddress + time
+                  )).join('\n')
+                )}
+              />
+              <FileExpand
+                heading="One Time Password"
+                query={GET_OTP}
+                args={{fileID}}
+                reshape={data => (
+                  <Link href={data.getOTP.otp}>
+                    {data.getOTP.otp}
+                  </Link>
+                )}
+              />
+              <FileExpand
+                heading="Details"
+                query={GET_FILE_SIZE}
+                args={{fileID}}
+                reshape={() => null}
+              />
             </div>
-          </Paper>
-        </Grow>
-      </Grid>
+          </Fragment>
+        </Paper>
+      </Grow>
     );
   }
 }
@@ -199,4 +188,4 @@ File.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(File);
+export default withStyles(styles)(withApollo(File));

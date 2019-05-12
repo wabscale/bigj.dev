@@ -9,7 +9,6 @@ const client = new ApolloClient({
   credentials: 'same-origin',
   request: async operation => {
     const token = await localStorage.getItem('token');
-    console.log(`loaded token ${token}`);
     operation.setContext({
       headers: {
         token,
