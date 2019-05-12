@@ -1,4 +1,4 @@
-const {getFile, getFiles, addUser} = require('../db');
+const {getFile, getFiles, addUser, updateFile, getDownloadHistory, getOTP} = require('../db');
 const {generateToken, loadUser} = require('./auth');
 // const passport = require('koa-passport');
 const {AuthenticationError} = require('apollo-server-koa');
@@ -50,8 +50,11 @@ const resolvers = {
       username: ctx.state.user ? ctx.state.user.username : '',
       })),
     login: (_, {username, password}) => ({token:generateToken(username, password)}),
+    fileHistory: (_, {fileID}) => getDownloadHistory(fileID),
+    getOTP: (_, {fileID}) => getOTP(fileID),
   },
   Mutation: {
+    updateFile: (_, {fileID, filename, isPublic}) => updateFile({fileID, filename, isPublic}),
     register: (_, {username, password}) => createUser(username, password),
   },
 };

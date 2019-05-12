@@ -7,9 +7,10 @@ const typeDefs = gql`
     """Files"""
     file(fileID: ID!): File!
     files: [File]!
+    fileHistory(fileID: ID!): [FileHistory]
 
     """OTP"""
-    otp(fileID: ID!): Otp!
+    getOTP(fileID: ID!): OTP!
 
     """Users"""
     me: User!
@@ -17,6 +18,15 @@ const typeDefs = gql`
       username: String!, 
       password: String!
     ): Token!
+  }
+
+  type Mutation {
+    updateFile(
+      fileID: ID!, 
+      filename: String!,
+      isPublic: Boolean!
+    ): File!
+    register(username: String!, password: String!): Token!
   }
   
   type Token {
@@ -33,14 +43,14 @@ const typeDefs = gql`
     isPublic: Boolean
     size: Int
   }
-
-  type Otp {
-    otp(fileID: String): String!
+  
+  type FileHistory {
+    ipAddress: String!
+    time: String!
   }
 
-  type Mutation {
-    updateFile(updates: String): File!
-    register(username: String!, password: String!): Token!
+  type OTP {
+    otp: String!
   }
 `;
 
