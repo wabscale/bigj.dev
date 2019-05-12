@@ -8,5 +8,7 @@ services:
     environment:
       - "MYSQL_ROOT_PASSWORD=password"
       - "MYSQL_DATABASE=db"
+    volumes:
+      - "./.data/mysql:/var/lib/mysql"
     labels:
       - "traefik.enable=false"
