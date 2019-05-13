@@ -1,7 +1,17 @@
-const {getFile, getFiles, addUser, updateFile, getDownloadHistory, getOTP} = require('../db');
+const {
+  getFiles,
+  addUser,
+  updateFile,
+  getDownloadHistory,
+  getOTP,
+  getFileById,
+  deleteFileById,
+} = require('../db');
 const {generateToken, loadUser} = require('./auth');
 // const passport = require('koa-passport');
 const {AuthenticationError} = require('apollo-server-koa');
+const fs = require('fs');
+const {UPLOAD_PATH} = require('../config');
 
 const requiresLogin = resolver => (parent, args, ctx, info) => {
   if (ctx.state.user)
@@ -21,9 +31,9 @@ getAllFiles = async () => {
   return response.map(file => fileReducer(file));
 };
 
-getFileById = async ({fileID}) => {
+getFile = async (fileID) => {
   const response = await getFileById(fileID);
-  return response !== null ? fileReducer(response) : [];
+  return response !== null ? fileReducer(response) : null;
 };
 
 getFilesById = ({fileIDs}) => {
@@ -35,27 +45,55 @@ getFilesById = ({fileIDs}) => {
 createUser = async (username, password) => {
   try {
     await addUser(username, password);
-    return {token:generateToken(username, password)};
+    return {token: generateToken(username, password)};
   } catch (e) {
-    return {token:''};
+    return {token: ''};
   }
-
 };
+
+yeetFile = async (id) => {
+  const file = await getFileById(id);
+  await deleteFileById(id);
+  return fileReducer(file);
+};
+
+const storeFS = ({ stream, filename }) => {
+  const path = `${UPLOAD_PATH}/${filename}`;
+  return new Promise((resolve, reject) =>
+    stream
+      .on('error', error => {
+        if (stream.truncated)
+        // Delete the truncated file.
+          fs.unlinkSync(path);
+        reject(error)
+      })
+      .pipe(fs.createWriteStream(path))
+      .on('error', error => reject(error))
+      .on('finish', () => resolve({ path }))
+  )
+}
 
 const resolvers = {
   Query: {
     files: requiresLogin(() => getAllFiles()),
-    file: requiresLogin((_, {fileID}) => getFileById(fileID)),
+    file: requiresLogin((_, {fileID}) => getFile(fileID)),
     me: requiresLogin((_, __, ctx) => ({
       username: ctx.state.user ? ctx.state.user.username : '',
-      })),
-    login: (_, {username, password}) => ({token:generateToken(username, password)}),
-    fileHistory: (_, {fileID}) => getDownloadHistory(fileID),
-    getOTP: (_, {fileID}) => getOTP(fileID),
+    })),
+    login: (_, {username, password}) => ({token: generateToken(username, password)}),
+    fileHistory: requiresLogin((_, {fileID}) => getDownloadHistory(fileID)),
+    getOTP: requiresLogin((_, {fileID}) => getOTP(fileID)),
   },
   Mutation: {
-    updateFile: (_, {fileID, filename, isPublic}) => updateFile({fileID, filename, isPublic}),
-    register: (_, {username, password}) => createUser(username, password),
+    updateFile: requiresLogin((_, {fileID, filename, isPublic}) => updateFile({fileID, filename, isPublic})),
+    // register: (_, {username, password}) => createUser(username, password),
+    deleteFile: requiresLogin((_, {fileID}) => yeetFile(fileID)),
+    singleUpload: requiresLogin(async (_, args, ctx) => {
+      const { createReadStream, filename, mimetype, encoding } = await args.file;
+      const stream = createReadStream();
+      await storeFS({stream, filename});
+      return { filename, mimetype, encoding };
+    }),
   },
 };
 

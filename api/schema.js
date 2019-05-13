@@ -1,5 +1,4 @@
-const {ApolloServer} = require('apollo-server-koa');
-const {gql} = require('apollo-server');
+const {ApolloServer, gql} = require('apollo-server-koa');
 const resolvers = require('./resolvers');
 
 const typeDefs = gql`
@@ -26,7 +25,15 @@ const typeDefs = gql`
       filename: String!,
       isPublic: Boolean!
     ): File!
+    deleteFile(fileID: ID!): File!
     register(username: String!, password: String!): Token!
+    singleUpload(file: Upload!): UploadFile!
+  }
+
+  type UploadFile {
+    filename: String!
+    mimetype: String!
+    encoding: String!
   }
   
   type Token {

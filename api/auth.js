@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const crypto = require("crypto");
 const {getUserByUsername, getUserById, addUser} = require('../db');
-const {keyPath} = require('../config.js');
+const {KEY_PATH} = require('../config.js');
 const {AuthenticationError} = require('apollo-server-koa');
 
 function comparePass(userPassword, databasePassword) {
@@ -12,12 +12,12 @@ function comparePass(userPassword, databasePassword) {
 
 generateKey = () => {
   let key = crypto.randomBytes(32).toString('hex');
-  fs.writeFileSync(keyPath, key);
+  fs.writeFileSync(KEY_PATH, key);
   return key;
 };
 
 loadKey = () => {
-  return fs.existsSync(keyPath) ? fs.readFileSync(keyPath) : generateKey();
+  return fs.existsSync(KEY_PATH) ? fs.readFileSync(KEY_PATH) : generateKey();
 };
 
 generateToken = async (username, password) => {

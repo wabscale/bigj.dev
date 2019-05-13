@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const {addFile, getFiles, deleteFileByFilename} = require('../db');
-const {uploadPath} = require('../config.js');
+const {UPLOAD_PATH} = require('../config.js');
 
 function difference(setA, setB) {
   let _difference = new Set(setA);
@@ -36,7 +36,7 @@ getFileSize = (filename) => {
 };
 
 const update = async (ctx, next) => {
-  const fsFilenames = new Set(fs.readdirSync(uploadPath));
+  const fsFilenames = new Set(fs.readdirSync(UPLOAD_PATH));
   const dbFilename = new Set((await getFiles()).map(file => file.filename));
 
   const newFiles = difference(fsFilenames, dbFilename);
@@ -45,12 +45,12 @@ const update = async (ctx, next) => {
   deletedFiles.forEach(filename => deleteFileByFilename({filename}));
   newFiles.forEach(filename => addFile({
     filename,
-    size: getFileSize(`${uploadPath}/${filename}`),
+    size: getFileSize(`${UPLOAD_PATH}/${filename}`),
   }));
 
   let files = await getFiles();
   files.forEach(file => {
-    file.size = getFileSize(`${uploadPath}/${file.filename}`);
+    file.size = getFileSize(`${UPLOAD_PATH}/${file.filename}`);
     file.save();
   });
 

@@ -6,6 +6,7 @@ const bodyParser = require('koa-bodyparser');
 const session = require('koa-session');
 const convert = require('koa-convert');
 const helmet = require('koa-helmet');
+const cors = require('@koa/cors');
 
 const {server} = require('./schema');
 const files = require('./files');
@@ -28,6 +29,13 @@ app.use(bodyParser({
 
 
 app.use(logger());
+// app.use(async (ctx, next) => {
+//   ctx.set('Origin', 'http://localhost:5000/');
+//   await next();
+// });
+app.use(cors({
+  origin: '*',
+}));
 server.applyMiddleware({app}); // /graphql
 
 const router = new Router();
@@ -44,7 +52,7 @@ if (process.env.NODE_ENV === 'development') {
   const koaPlayground = require('graphql-playground-middleware-koa').default;
   // console.log(koaPlayground)
   router.all('/playground', koaPlayground({endpoint: '/graphql'}));
-  console.log(`playground: http://localhost:${PORT}/playground`);
+  console.log(`playground: http://api.localhost:${PORT}/playground`);
 }
 
 app.use(router.routes());
