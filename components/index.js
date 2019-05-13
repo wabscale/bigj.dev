@@ -9,6 +9,17 @@ import Paperbase from './Paperbase';
 const authFetch = (uri, options) => {
   options.headers.token = localStorage.getItem('token');
   return fetch(uri, options)
+};
+
+const defaultOptions = {
+  watchQuery: {
+    fetchPolicy: 'network-only',
+    errorPolicy: 'ignore',
+  },
+  query: {
+    fetchPolicy: 'no-cache',
+    errorPolicy: 'all',
+  },
 }
 
 const client = new ApolloClient({
@@ -18,6 +29,7 @@ const client = new ApolloClient({
     fetch: authFetch,
   }),
   cache: new InMemoryCache(),
+  defaultOptions: defaultOptions,
 });
 
 ReactDOM.render((

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {createMuiTheme, MuiThemeProvider, withStyles} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Hidden from '@material-ui/core/Hidden';
+import {withApollo} from "react-apollo";
 import Navigator from './Navigator';
 import FileContent from './File/FileContent';
 import LoginContent from './Login/LoginContent';
@@ -169,6 +170,8 @@ class Paperbase extends React.Component {
 
   switchView(id) {
     if (id === "Sign Out") {
+      const {client} = this.props;
+      client.resetStore(); // yeet cache
       localStorage.removeItem('token');
       id='Sign In';
     }
@@ -231,5 +234,5 @@ Paperbase.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Paperbase);
+export default withStyles(styles)(withApollo(Paperbase));
 

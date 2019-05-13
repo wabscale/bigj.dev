@@ -1,4 +1,4 @@
-import React, {Fragment, PureComponent} from 'react';
+import React, {Fragment, PureComponent, Component} from 'react';
 import PropTypes from 'prop-types';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -110,7 +110,7 @@ class SearchBar extends PureComponent {
   }
 }
 
-class FileContent extends PureComponent {
+class FileContent extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -125,7 +125,10 @@ class FileContent extends PureComponent {
   }
 
   deleteFile = async ({fileID}) => {
-    this.state.files.delete(fileID);
+    const {files} = this.state;
+    this.setState({
+      files: files.filter(file => file.fileID !== fileID),
+    });
   };
 
   update = async () => {
@@ -149,8 +152,6 @@ class FileContent extends PureComponent {
     const {searchTerm, activeStep} = this.state;
 
     return (
-      //<AutoSizer>
-      //   {({height, width}) => (
       <Fragment>
         <Grid
           container
@@ -203,7 +204,7 @@ class FileContent extends PureComponent {
               </AppBar>
             </Paper>
           </Grid>
-          <Query query={GET_FILES}>
+          <Query query={GET_FILES} fetchPolicy='network-only'>
             {({data, loading, error}) => {
               if (loading)
                 return (
@@ -217,14 +218,25 @@ class FileContent extends PureComponent {
                   <Fragment/>
                 );
               }
+
               const files = data.files.map(
                 ({fileID, filename, isPublic}) => ({fileID: parseInt(fileID), filename, isPublic})
-              ).sort(
+              );
+
+              if (this.state.files.length === 0)
+                this.state.files = files;
+              else
+                files.forEach(file => {
+                  if (this.state.files.findIndex(other => other.fileID === file.fileID) === -1) {
+                    this.state.files.push(file);
+                  }
+                });
+
+              this.state.files.sort(
                 (a, b) => (a.fileID < b.fileID ? 1 : a.fileID > b.fileID ? -1 : 0)
               );
-              this.state.files = files;
 
-              const displayFiles = files.filter(file => (
+              const displayFiles = this.state.files.filter(file => (
                 searchTerm.length === 0 || file.filename.toLowerCase().includes(searchTerm.toLowerCase())
               ));
               this.state.fileCount = displayFiles.length;
@@ -240,6 +252,8 @@ class FileContent extends PureComponent {
 
               const {fileCount} = this.state;
               const steps = Math.ceil(fileCount / displayCount);
+
+              console.log('yeeet')
 
               return (
                 <Fragment>
