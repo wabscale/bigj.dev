@@ -1,11 +1,11 @@
 const fs = require('fs');
 
 const config = {
-  keyPath: '.data/site.key',
-  uploadPath: '.data/files',
+  KEY_PATH: '.data/site.key',
+  UPLOAD_PATH: '.data/files',
 };
 
-if (!fs.existsSync(config.uploadPath))
-  fs.mkdirSync(config.uploadPath, {recursive:true});
+if (!fs.existsSync(config.UPLOAD_PATH))
+  fs.mkdirSync(config.UPLOAD_PATH, {recursive:true});
 
 module.exports = config;
