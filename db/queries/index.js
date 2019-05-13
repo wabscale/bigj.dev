@@ -50,7 +50,7 @@ module.exports = {
   deleteFileByFilename: async ({filename}) => (
     await db.File.destroy({where: {filename,}})
   ),
-  deleteFileById: async ({id}) => (
+  deleteFileById: async (id) => (
     await db.File.destroy({where: {id,}})
   ),
 
