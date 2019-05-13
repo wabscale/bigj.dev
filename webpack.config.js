@@ -59,7 +59,7 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      APIHOST: JSON.stringify(process.env.APIHOST || 'http://localhost:8080'),
+      APIHOST: JSON.stringify(process.env.APIHOST || 'http://api.localhost:8080/graphql'),
     }),
     function () {
       this.plugin('done', async stats => {
