@@ -6,6 +6,7 @@ const {
   getOTP,
   getFileById,
   deleteFileById,
+  addFile
 } = require('../db');
 const {generateToken, loadUser} = require('./auth');
 // const passport = require('koa-passport');
@@ -53,6 +54,7 @@ createUser = async (username, password) => {
 
 yeetFile = async (id) => {
   const file = await getFileById(id);
+  fs.unlinkSync(`${UPLOAD_PATH}/${file.filename}`);
   await deleteFileById(id);
   return fileReducer(file);
 };
@@ -73,6 +75,14 @@ const storeFS = ({ stream, filename }) => {
   )
 }
 
+handleUpload = async (file) => {
+  const { createReadStream, filename, mimetype, encoding } = await file;
+  const stream = createReadStream();
+  await storeFS({stream, filename});
+  await addFile({filename});
+  return { filename, mimetype, encoding };
+}
+
 const resolvers = {
   Query: {
     files: requiresLogin(() => getAllFiles()),
@@ -88,12 +98,7 @@ const resolvers = {
     updateFile: requiresLogin((_, {fileID, filename, isPublic}) => updateFile({fileID, filename, isPublic})),
     // register: (_, {username, password}) => createUser(username, password),
     deleteFile: requiresLogin((_, {fileID}) => yeetFile(fileID)),
-    singleUpload: requiresLogin(async (_, args, ctx) => {
-      const { createReadStream, filename, mimetype, encoding } = await args.file;
-      const stream = createReadStream();
-      await storeFS({stream, filename});
-      return { filename, mimetype, encoding };
-    }),
+    singleUpload: requiresLogin(async (_, {file}) => handleUpload(file)),
   },
 };
 
