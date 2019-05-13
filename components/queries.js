@@ -58,8 +58,26 @@ export const GET_FILE_SIZE = gql`
 export const UPDATE_FILE = gql`
   mutation UpdateFile($fileID: ID!, $filename: String!, $isPublic: Boolean!) {
     updateFile(fileID: $fileID, filename: $filename, isPublic: $isPublic) {
-      filename, 
+      filename,
       isPublic
+    }
+  }
+`;
+
+export const DELETE_FILE = gql`
+  mutation DeleteFile($fileID: ID!) {
+    deleteFile(fileID: $fileID) {
+      fileID
+      filename
+    }
+  }
+`;
+
+
+export const UPLOAD_FILE = gql`
+  mutation UploadFile($file: Upload!) {
+    singleUpload(file: $file) {
+      filename
     }
   }
 `;

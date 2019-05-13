@@ -9,6 +9,7 @@ import Typography from "@material-ui/core/Typography";
 import {LOGIN} from '../queries';
 import {ApolloConsumer} from 'react-apollo';
 import Chip from '@material-ui/core/Chip';
+import Grow from '@material-ui/core/Grow';
 
 const styles = theme => ({
   container: {
@@ -85,7 +86,7 @@ class LoginContent extends React.PureComponent {
       switchView("View");
     }).catch(e => {
       console.log(e);
-      this.setState({unauth: true})
+      this.setState({unauth: true});
     });
   }
 
@@ -97,73 +98,86 @@ class LoginContent extends React.PureComponent {
       <Grid container spacing={24} alignItems="center" justify="center" direction="column">
         {
           unauth ? (
-        <Grid item key="alert">
-          <Chip
-            label="Invalid Credentials"
-            className={classes.paper}
-            color="secondary"
-            onDelete={() => this.setState({unauth: false})}
-          />
-        </Grid>
-          ) : <Fragment />
+            <Grow
+              in={unauth}
+              timeout={250}
+              unmountOnExit
+            >
+              <Grid item key="alert">
+                <Chip
+                  label="Invalid Credentials"
+                  className={classes.paper}
+                  color="secondary"
+                  onDelete={() => this.setState({unauth: false})}
+                />
+              </Grid>
+            </Grow>
+          ) : <Fragment/>
         }
         <Grid item key="form">
           <ApolloConsumer>
             {client => (
-              <Paper className={classes.paper}>
-                <Grid container spacing={16}>
-                  <Grid item key="title" xs={12}>
-                    <Typography
-                      variant="h5"
-                      component="h3"
-                    >
-                      Login Plz
-                    </Typography>
+              <Grow
+                in={true}
+                timeout={500}
+              >
+                <Paper className={classes.paper}>
+                  <Grid container spacing={16}>
+                    <Grid item key="title" xs={12}>
+                      <Typography
+                        variant="h5"
+                        component="h3"
+                      >
+                        Login Plz
+                      </Typography>
+                    </Grid>
+                    <Grid item key="username" xs={12}>
+                      <TextField
+                        required
+                        id="outlined-required"
+                        name="username"
+                        label="Username"
+                        className={classes.textField}
+                        margin="normal"
+                        variant="outlined"
+                        value={username}
+                        onChange={e => this.setState({
+                          username: e.target.value,
+                        })}
+                        onKeyPress={e => e.key === 'Enter' ? this.login(client) : null}
+                      />
+                    </Grid>
+                    <Grid item key="password" xs={12}>
+                      <TextField
+                        required
+                        id="outlined-password-input"
+                        name="password"
+                        label="Password"
+                        className={classes.textField}
+                        type="password"
+                        margin="normal"
+                        variant="outlined"
+                        value={password}
+                        onChange={e => this.setState({
+                          password: e.target.value,
+                        })}
+                        onKeyPress={e => e.key === 'Enter' ? this.login(client) : null}
+                      />
+                    </Grid>
+                    <Grid item key="submit" xs={12}>
+                      <Button
+                        variant="contained"
+                        className={classes.button}
+                        onClick={() => this.login(client)}
+                        color="primary"
+                        type="submit"
+                      >
+                        Submit
+                      </Button>
+                    </Grid>
                   </Grid>
-                  <Grid item key="username" xs={12}>
-                    <TextField
-                      required
-                      id="outlined-required"
-                      name="username"
-                      label="Username"
-                      className={classes.textField}
-                      margin="normal"
-                      variant="outlined"
-                      value={username}
-                      onChange={e => this.setState({
-                        username: e.target.value,
-                      })}
-                    />
-                  </Grid>
-                  <Grid item key="password" xs={12}>
-                    <TextField
-                      required
-                      id="outlined-password-input"
-                      name="password"
-                      label="Password"
-                      className={classes.textField}
-                      type="password"
-                      margin="normal"
-                      variant="outlined"
-                      value={password}
-                      onChange={e => this.setState({
-                        password: e.target.value,
-                      })}
-                    />
-                  </Grid>
-                  <Grid item key="submit" xs={12}>
-                    <Button
-                      variant="contained"
-                      className={classes.button}
-                      onClick={() => this.login(client)}
-                      color="primary"
-                      type="submit"
-                    >
-                      Submit
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Paper>
+                </Paper>
+              </Grow>
             )}
           </ApolloConsumer>
         </Grid>

@@ -12,13 +12,19 @@ import FormControl from "@material-ui/core/FormControl";
 import IconButton from '@material-ui/core/IconButton';
 import Input from '@material-ui/core/Input';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import {Query} from 'react-apollo';
+import {Query, Mutation} from 'react-apollo';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from '@material-ui/core/Typography';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faFrown} from '@fortawesome/free-solid-svg-icons/faFrown';
+import MobileStepper from '@material-ui/core/MobileStepper';
+import Button from '@material-ui/core/Button';
+import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 
-import {GET_FILE, GET_FILES} from '../queries';
+import {GET_FILE, GET_FILES, UPLOAD_FILE} from '../queries';
 import File from './File';
+import {withApollo} from "react-apollo";
 
 const styles = theme => ({
   root: {
@@ -86,13 +92,10 @@ class SearchBar extends PureComponent {
           inputProps={{
             className: classes.searchInput,
           }}
-          onKeyDown={e => {
-            this.setState({
-              searchTerm: e.target.value,
-            });
-            if (e.key === 'Enter') this.runSearch(
-              e.target.value,
-            );
+          onChange={async e => {
+            e.preventDefault();
+            this.runSearch(e.target.value);
+            this.setState({searchTerm: e.target.value});
           }}
           startAdornment={
             <InputAdornment position="start">
@@ -107,55 +110,43 @@ class SearchBar extends PureComponent {
   }
 }
 
-class FileContent extends React.PureComponent {
+class FileContent extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
       searchTerm: "",
       files: [],
+      activeStep: 0,
+      fileCount: 0,
     };
     this.deleteFile = this.deleteFile.bind(this);
-    this.uploadFile = this.uploadFile.bind(this);
+    // this.uploadFile = this.uploadFile.bind(this);
     this.update = this.update.bind(this);
   }
 
-  deleteFile = async ({fileId, filename}) => {
-    const {api} = this.props;
-    let files = this.state.files.slice();
-
-    const idx = files.findIndex(file => file.fileId === fileId);
-
-    if (idx !== -1) files.splice(idx, 1);
-    this.state.files = files;
-
-    api.post(`/api/files/${fileId}`, {
-      action: 'delete',
-      filename: filename,
-    });
-  };
-
-  uploadFile = async (event) => {
-    const {api} = this.props;
-    const data = new FormData();
-    data.append('file', event.target.files[0]);
-    api.post('/api/files/new', data).then(this.update);
+  deleteFile = async ({fileID}) => {
+    this.state.files.delete(fileID);
   };
 
   update = async () => {
-    const {api} = this.props;
-    api.get('/api/files').then(res => {
-      if (res.data.success) {
-        const {data} = res.data;
-        this.setState({
-          files: data.slice(),
-        });
-      }
-    });
+    this.forceUpdate();
+  };
+
+  handleNext = () => {
+    this.setState(state => ({
+      activeStep: state.activeStep + 1,
+    }));
+  };
+
+  handleBack = () => {
+    this.setState(state => ({
+      activeStep: state.activeStep - 1,
+    }));
   };
 
   render() {
-    const {classes, switchView} = this.props;
-    const {searchTerm} = this.state;
+    const {classes, switchView, displayCount} = this.props;
+    const {searchTerm, activeStep} = this.state;
 
     return (
       //<AutoSizer>
@@ -176,26 +167,32 @@ class FileContent extends React.PureComponent {
                   <Grid container spacing={16} alignItems="center">
                     <Grid item xs={12} key="searchBar">
                       <SearchBar classes={classes} onChange={searchTerm => {
-                        this.setState({searchTerm: searchTerm});
+                        this.setState({searchTerm: searchTerm, activeStep: 0});
                       }}/>
                     </Grid>
                   </Grid>
                   <Grid item key="uploadButton">
-                    <Fragment>
-                      <input
-                        accept="*"
-                        className={classes.input}
-                        id="icon-button-file"
-                        onChange={this.uploadFile}
-                        type="file"
-                        hidden
-                      />
-                      <label htmlFor="icon-button-file">
-                        <IconButton variant="contained" className={classes.addUser} component="span">
-                          <CloudUploadIcon/>
-                        </IconButton>
-                      </label>
-                    </Fragment>
+                    <Mutation mutation={UPLOAD_FILE}>
+                      {uploadFile => (
+                        <Fragment>
+                          <input
+                            accept="*"
+                            className={classes.input}
+                            id="icon-button-file"
+                            onChange={({ target: { validity, files } }) =>
+                              validity.valid && uploadFile({ variables: { file:files[0] } })
+                            }
+                            type="file"
+                            hidden
+                          />
+                          <label htmlFor="icon-button-file">
+                            <IconButton variant="contained" className={classes.addUser} component="span">
+                              <CloudUploadIcon/>
+                            </IconButton>
+                          </label>
+                        </Fragment>
+                      )}
+                    </Mutation>
                   </Grid>
                   <Grid item key="refreshButton">
                     <IconButton onClick={this.update}>
@@ -220,34 +217,78 @@ class FileContent extends React.PureComponent {
                   <Fragment/>
                 );
               }
+              const files = data.files.map(
+                ({fileID, filename, isPublic}) => ({fileID: parseInt(fileID), filename, isPublic})
+              ).sort(
+                (a, b) => (a.fileID < b.fileID ? 1 : a.fileID > b.fileID ? -1 : 0)
+              );
+              this.state.files = files;
 
-              const {files} = data;
-
-              // const displayFiles = files.filter(file => (
-              //   file.filename.toLowerCase().includes(searchTerm.toLowerCase())
-              // ));
-
-              // if (displayFiles.length === 0)
-              //   return (
-              //     <Paper className={classes.paper}>
-              //       <Typography variant="h5" className={classes.typography}>
-              //         No Files to Show <FontAwesomeIcon icon={faFrown}/>
-              //       </Typography>
-              //     </Paper>
-              //   );
-              // console.log(displayFiles);
-
-              this.state.files = files.map((file, index) => (
-                <Grid item key={`file_${file.fileID}`}>
-                  <File
-                    key={`file_${file.fileID}_file`}
-                    file={file}
-                    delete={() => this.deleteFile(file)}
-                    index={index}
-                  />
-                </Grid>
+              const displayFiles = files.filter(file => (
+                searchTerm.length === 0 || file.filename.toLowerCase().includes(searchTerm.toLowerCase())
               ));
-              return this.state.files;
+              this.state.fileCount = displayFiles.length;
+
+              if (displayFiles.length === 0)
+                return (
+                  <Paper className={classes.paper}>
+                    <Typography variant="h5" className={classes.typography}>
+                      No Files to Show <FontAwesomeIcon icon={faFrown}/>
+                    </Typography>
+                  </Paper>
+                );
+
+              const {fileCount} = this.state;
+              const steps = Math.ceil(fileCount / displayCount);
+
+              return (
+                <Fragment>
+                  {displayFiles.slice(
+                    activeStep * displayCount,
+                    ((activeStep + 1) * displayCount)
+                  ).map((file, index) => (
+                    <File
+                      key={`file_${file.fileID}_file`}
+                      file={file}
+                      delete={() => this.deleteFile(file)}
+                      index={index}
+                    />
+                  ))}
+                  <Grid item xs={12}>
+                    <MobileStepper
+                      variant="dots"
+                      steps={steps}
+                      position="static"
+                      activeStep={this.state.activeStep}
+                      className={classes.root}
+                      nextButton={
+                        <Button
+                          size="small"
+                          onClick={this.handleNext}
+                          disabled={this.state.activeStep === steps}
+                          color={"primary"}
+                          variant="contained"
+                        >
+                          Next
+                          <KeyboardArrowRight/>
+                        </Button>
+                      }
+                      backButton={
+                        <Button
+                          size="small"
+                          onClick={this.handleBack}
+                          disabled={this.state.activeStep === 0}
+                          color={"primary"}
+                          variant="contained"
+                        >
+                          <KeyboardArrowLeft/>
+                          Back
+                        </Button>
+                      }
+                    />
+                  </Grid>
+                </Fragment>
+              );
             }}
           </Query>
         </Grid>
@@ -260,4 +301,4 @@ FileContent.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(FileContent);
+export default withStyles(styles)(withApollo(FileContent));

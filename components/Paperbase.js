@@ -169,7 +169,8 @@ class Paperbase extends React.Component {
 
   switchView(id) {
     if (id === "Sign Out") {
-      document.location.href = "/auth/logout";
+      localStorage.removeItem('token');
+      id='Sign In';
     }
     this.setState({
       active: id,
@@ -210,6 +211,7 @@ class Paperbase extends React.Component {
                   active === "View" ? <FileContent
                       switchView={this.switchView}
                       style={{height:"100%",width:"100%"}}
+                      displayCount={9}
                     /> :
                     active === "Sign In" ? <LoginContent
                         switchView={this.switchView}

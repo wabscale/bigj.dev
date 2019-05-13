@@ -15,8 +15,15 @@ import Switch from '@material-ui/core/Switch';
 import Link from '@material-ui/core/Link';
 import PropTypes from "prop-types";
 import Grow from '@material-ui/core/Grow';
-import {withApollo} from 'react-apollo';
-import {GET_DOWNLOAD_HISTORY, GET_OTP, GET_FILE_SIZE, UPDATE_FILE} from "../queries";
+import Typography from '@material-ui/core/Typography';
+import {withApollo, Mutation} from 'react-apollo';
+import {
+  GET_DOWNLOAD_HISTORY,
+  GET_OTP,
+  GET_FILE_SIZE,
+  UPDATE_FILE,
+  DELETE_FILE
+} from "../queries";
 
 const styles = theme => ({
   paper: {
@@ -46,7 +53,7 @@ class File extends PureComponent {
     super(props);
     this.state = {
       ...props.file,
-      display: 'inherit',
+      display: true,
     };
 
     this.togglePublic = this.togglePublic.bind(this);
@@ -69,116 +76,151 @@ class File extends PureComponent {
     }, this.update);
   }
 
+  truncateDecimals = (number, digits) => {
+    let multiplier = Math.pow(10, digits),
+      adjustedNum = number * multiplier,
+      truncatedNum = Math[adjustedNum < 0 ? 'ceil' : 'floor'](adjustedNum);
+
+    return truncatedNum / multiplier;
+  };
+
+  humanSize = (nbytes) => {
+    let suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+    let i = 0;
+    let f = `${nbytes}`;
+    while (nbytes >= 1024 && i < suffixes.length - 1) {
+      nbytes /= 1024;
+      ++i;
+      f = this.truncateDecimals(nbytes, 2);
+    }
+    return `${nbytes} ${suffixes[i]}`;
+  };
+
   render() {
     const {classes, index} = this.props;
-    const {fileID, filename, isPublic} = this.state;
-    console.log("render file");
+    const {fileID, filename, isPublic, display} = this.state;
 
     return (
       <Grow
-        in={true}
+        in={display}
         style={{transformOrigin: '0 0 0'}}
-        timeout={250 + (index * 250)}
+        timeout={(index+1) * 400}
         key={`file_${fileID}_grow`}
+        // mountOnEnter
+        unmountOnExit
       >
-        <Paper className={classes.paper}>
-          <Fragment>
-            <AppBar className={classes.searchBar} position="static" color="default" elevation={0}>
-              <Toolbar>
-                <Grid
-                  container
-                  spacing={16}
-                  alignItems="center"
-                  key={`file_${fileID}_toolbar`}
-                >
-                  <Grid item xs key={`file_${fileID}_filename`}>
-                    <TextField
-                      fullWidth
-                      value={filename}
-                      InputProps={{
-                        disableUnderline: true,
-                        className: classes.searchInput,
-                      }}
-                      onChange={event => this.setState({
-                        filename: event.target.value,
-                      })}
-                      onKeyPress={event => event.key === "Enter" ? this.update(client) : {}}
-                    />
-                  </Grid>
-                  <Grid item key={`file_${fileID}_save`}>
-                    <Tooltip title="Save">
-                      <IconButton color="default" onClick={() => this.update(client)}>
-                        <SaveIcon
-                          classes={{root: classes.block}}
-                          color="inherit"
-                        />
-                      </IconButton>
-                    </Tooltip>
-                  </Grid>
-                  <Grid item key={`file_${fileID}_download`}>
-                    <Tooltip title="Download">
-                      <IconButton href={`/f/${filename}`}>
-                        <CloudDownloadIcon
-                          classes={{root: classes.block}}
-                          color="inherit"
-                        />
-                      </IconButton>
-                    </Tooltip>
-                  </Grid>
-                  <Grid item key={`file_${fileID}_public`}>
-                    <Tooltip title={isPublic ? "Public" : "Private"}>
-                      <Switch
-                        checked={isPublic}
-                        onChange={this.togglePublic}
-                        color="primary"
+        <Grid item key={`file_${fileID}`}>
+          <Paper className={classes.paper}>
+            <Fragment>
+              <AppBar className={classes.searchBar} position="static" color="default" elevation={0}>
+                <Toolbar>
+                  <Grid
+                    container
+                    spacing={16}
+                    alignItems="center"
+                    key={`file_${fileID}_toolbar`}
+                  >
+                    <Grid item xs key={`file_${fileID}_filename`}>
+                      <TextField
+                        fullWidth
+                        value={filename}
+                        InputProps={{
+                          disableUnderline: true,
+                          className: classes.searchInput,
+                        }}
+                        onChange={event => this.setState({
+                          filename: event.target.value,
+                        })}
+                        onKeyPress={event => event.key === "Enter" ? this.update() : {}}
                       />
-                    </Tooltip>
+                    </Grid>
+                    <Grid item key={`file_${fileID}_save`}>
+                      <Tooltip title="Save">
+                        <IconButton color="default" onClick={() => this.update()}>
+                          <SaveIcon
+                            classes={{root: classes.block}}
+                            color="inherit"
+                          />
+                        </IconButton>
+                      </Tooltip>
+                    </Grid>
+                    <Grid item key={`file_${fileID}_download`}>
+                      <Tooltip title="Download">
+                        <IconButton href={`/f/${filename}`}>
+                          <CloudDownloadIcon
+                            classes={{root: classes.block}}
+                            color="inherit"
+                          />
+                        </IconButton>
+                      </Tooltip>
+                    </Grid>
+                    <Grid item key={`file_${fileID}_public`}>
+                      <Tooltip title={isPublic ? "Public" : "Private"}>
+                        <Switch
+                          checked={isPublic}
+                          onChange={this.togglePublic}
+                          color="primary"
+                        />
+                      </Tooltip>
+                    </Grid>
+                    <Grid item key={`file_${fileID}_delete`}>
+                      <Mutation mutation={DELETE_FILE}>
+                        {deleteFile => (
+                          <Tooltip title="Delete">
+                            <IconButton onClick={async e => {
+                              e.preventDefault();
+                              deleteFile({
+                                variables: {fileID}
+                              });
+                              this.props.delete();
+                              this.setState({display: false});
+                            }}>
+                              <DeleteIcon classes={{root: classes.block}} color="secondary"/>
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </Mutation>
+                    </Grid>
                   </Grid>
-                  <Grid item key={`file_${fileID}_delete`}>
-                    <Tooltip title="Delete">
-                      <IconButton onClick={async () => {
-                        this.setState({
-                          display: 'none',
-                        });
-                        this.props.delete();
-                      }}>
-                        <DeleteIcon classes={{root: classes.block}} color="secondary"/>
-                      </IconButton>
-                    </Tooltip>
-                  </Grid>
-                </Grid>
-              </Toolbar>
-            </AppBar>
-            <div className={classes.root}>
-              <FileExpand
-                heading="History"
-                query={GET_DOWNLOAD_HISTORY}
-                args={{fileID}}
-                reshape={data => (
-                  data.fileHistory.map(({ipAddress, time}) => (
-                    ipAddress + time
-                  )).join('\n')
-                )}
-              />
-              <FileExpand
-                heading="One Time Password"
-                query={GET_OTP}
-                args={{fileID}}
-                reshape={data => (
-                  <Link href={data.getOTP.otp}>
-                    {data.getOTP.otp}
-                  </Link>
-                )}
-              />
-              <FileExpand
-                heading="Details"
-                query={GET_FILE_SIZE}
-                args={{fileID}}
-                reshape={() => null}
-              />
-            </div>
-          </Fragment>
-        </Paper>
+                </Toolbar>
+              </AppBar>
+              <div className={classes.root}>
+                <FileExpand
+                  heading="History"
+                  query={GET_DOWNLOAD_HISTORY}
+                  args={{fileID}}
+                  reshape={data => (
+                    <Typography>
+                      {data.fileHistory.map(({ipAddress, time}) => (
+                        ipAddress + time
+                      )).join('\n') || ''}
+                    </Typography>
+                  )}
+                />
+                <FileExpand
+                  heading="One Time Password"
+                  query={GET_OTP}
+                  args={{fileID}}
+                  reshape={data => (
+                    <Link href={data.getOTP.otp}>
+                      {data.getOTP.otp}
+                    </Link>
+                  )}
+                />
+                <FileExpand
+                  heading="Details"
+                  query={GET_FILE_SIZE}
+                  args={{fileID}}
+                  reshape={data => (
+                    <Typography>
+                      {this.humanSize(data.file.size)}
+                    </Typography>
+                  )}
+                />
+              </div>
+            </Fragment>
+          </Paper>
+        </Grid>
       </Grow>
     );
   }

@@ -8,6 +8,7 @@ import {withStyles} from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import {Query} from 'react-apollo';
 import CircularProgress from "@material-ui/core/CircularProgress";
+import Grow from '@material-ui/core/Grow';
 
 const styles = theme => ({
   root: {
@@ -27,7 +28,6 @@ class FileExpand extends React.Component {
   render() {
     const {classes, query, args, heading, reshape} = this.props;
     const {expanded} = this.state;
-    // console.log(args);
 
     return (
       <ExpansionPanel onChange={() => this.setState({expanded: !expanded})}>
@@ -43,7 +43,16 @@ class FileExpand extends React.Component {
                     return <CircularProgress className={classes.progress}/>;
                   if (error)
                     return <Fragment/>;
-                  return reshape(data);
+                  return (
+                    <Grow
+                      in={expanded}
+                      timeout={250}
+                      mountOnEnter
+                      unmountOnExit
+                    >
+                      {reshape(data)}
+                    </Grow>
+                  );
                 }}
               </Query>
               : <Fragment/>

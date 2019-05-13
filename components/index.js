@@ -1,20 +1,23 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
-import ApolloClient from 'apollo-boost';
+import ApolloClient from 'apollo-client';
+const { createUploadLink } = require('apollo-upload-client');
+const { InMemoryCache } = require('apollo-cache-inmemory');
 import {ApolloProvider} from 'react-apollo';
 import Paperbase from './Paperbase';
 
+const authFetch = (uri, options) => {
+  options.headers.token = localStorage.getItem('token');
+  return fetch(uri, options)
+}
+
 const client = new ApolloClient({
-  uri: 'http://api.localhost:8080/graphql',
-  credentials: 'same-origin',
-  request: async operation => {
-    const token = await localStorage.getItem('token');
-    operation.setContext({
-      headers: {
-        token,
-      }
-    });
-  },
+  link: createUploadLink({
+    uri: APIHOST,
+    credentials: 'same-origin',
+    fetch: authFetch,
+  }),
+  cache: new InMemoryCache(),
 });
 
 ReactDOM.render((
