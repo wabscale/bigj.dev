@@ -1,7 +1,6 @@
 const Koa = require('koa');
 const Router = require('koa-router');
 const logger = require('koa-logger');
-// const passport = require('koa-passport');
 const bodyParser = require('koa-bodyparser');
 const session = require('koa-session');
 const convert = require('koa-convert');
@@ -10,7 +9,7 @@ const cors = require('@koa/cors');
 
 const {server} = require('./schema');
 const files = require('./files');
-const {loadUser} = require('./auth');
+const {loadUser} = require('../auth');
 
 const PORT = process.env.PORT || '8080';
 const app = new Koa();
@@ -29,10 +28,6 @@ app.use(bodyParser({
 
 
 app.use(logger());
-// app.use(async (ctx, next) => {
-//   ctx.set('Origin', 'http://localhost:5000/');
-//   await next();
-// });
 app.use(cors({
   origin: '*',
 }));

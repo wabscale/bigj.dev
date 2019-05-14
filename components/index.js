@@ -14,11 +14,9 @@ const authFetch = (uri, options) => {
 const defaultOptions = {
   watchQuery: {
     fetchPolicy: 'network-only',
-    errorPolicy: 'ignore',
   },
   query: {
     fetchPolicy: 'no-cache',
-    errorPolicy: 'all',
   },
 }
 

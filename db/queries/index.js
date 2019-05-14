@@ -10,6 +10,10 @@ module.exports = {
     let files = await db.File.findAll({where: {id,}});
     return files.length === 1 ? files[0] : null;
   },
+  getFileByFilename: async filename => {
+    let files = await db.File.findAll({where: {filename,}});
+    return files.length === 1 ? files[0] : null;
+  },
   getUserById: async id => {
     let users = await db.User.findAll({where: {id,}});
     return users.length === 1 ? users[0] : null;
@@ -45,6 +49,7 @@ module.exports = {
     await db.User.create({username, password: bcrypt.hashSync(password, 10)})
   ),
   addConfig: (key, value) => db.Config.create({key, value}),
+  addDownload: (fileID, ipAddress, allowed) => db.DownloadHistory.create({fileID, ipAddress, allowed}),
 
   // delete
   deleteFileByFilename: async ({filename}) => (

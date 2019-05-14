@@ -3,7 +3,8 @@ module.exports = (sequelize, DataTypes) => {
   const DownloadHistory = sequelize.define('DownloadHistory', {
     fileID: DataTypes.INTEGER,
     ipAddress: DataTypes.STRING,
-    time: DataTypes.TIME
+    time: DataTypes.TIME,
+    allowed: DataTypes.BOOLEAN,
   }, {});
   DownloadHistory.associate = function(models) {
     // associations can be defined here
@@ -11,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     File.hasMany(DownloadHistory);
     DownloadHistory.belongsTo(File, {
       as: 'download',
-      foriengKey: 'fileID',
+      foreignKey: 'fileID',
     })
   };
   return DownloadHistory;

@@ -2,8 +2,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const crypto = require("crypto");
-const {getUserByUsername, getUserById, addUser} = require('../db');
-const {KEY_PATH} = require('../config.js');
+const {getUserByUsername, getUserById, addUser} = require('./db');
+const {KEY_PATH} = require('./config.js');
 const {AuthenticationError} = require('apollo-server-koa');
 
 function comparePass(userPassword, databasePassword) {
@@ -25,12 +25,14 @@ generateToken = async (username, password) => {
   const user = await getUserByUsername(username);
   if (user === null || !comparePass(password, user.password))
     throw new AuthenticationError('Unauthorized');
-  return jwt.sign({id: user.id}, loadKey(), {expiresIn: '1h'});
+  return jwt.sign({id: user.id}, loadKey(), {expiresIn: '7d'});
 };
 
 loadUser = async (ctx, next) => {
   try {
-    const token = jwt.verify(ctx.req.headers.token,loadKey());
+    const loadedToken = ctx.req.headers.token || ctx.session.token;
+    console.log('$$$$$$$', ctx.session);
+    const token = jwt.verify(loadedToken, loadKey());
     ctx.state.user = await getUserById(token.id);
   } catch(err) {}
   await next();

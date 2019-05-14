@@ -8,8 +8,7 @@ const {
   deleteFileById,
   addFile
 } = require('../db');
-const {generateToken, loadUser} = require('./auth');
-// const passport = require('koa-passport');
+const {generateToken} = require('../auth');
 const {AuthenticationError} = require('apollo-server-koa');
 const fs = require('fs');
 const {UPLOAD_PATH} = require('../config');
@@ -90,7 +89,12 @@ const resolvers = {
     me: requiresLogin((_, __, ctx) => ({
       username: ctx.state.user ? ctx.state.user.username : '',
     })),
-    login: (_, {username, password}) => ({token: generateToken(username, password)}),
+    login: (_, {username, password}, ctx) => {
+      const token = generateToken(username, password);
+      ctx.cookies.set('token', token);
+      // ctx.session.token = token;
+      return {token};
+    },
     fileHistory: requiresLogin((_, {fileID}) => getDownloadHistory(fileID)),
     getOTP: requiresLogin((_, {fileID}) => getOTP(fileID)),
   },
