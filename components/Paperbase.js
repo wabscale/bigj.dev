@@ -4,6 +4,7 @@ import {createMuiTheme, MuiThemeProvider, withStyles} from '@material-ui/core/st
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Hidden from '@material-ui/core/Hidden';
 import {withApollo} from "react-apollo";
+import Cookies from 'universal-cookie';
 import Navigator from './Navigator';
 import FileContent from './File/FileContent';
 import LoginContent from './Login/LoginContent';
@@ -171,8 +172,12 @@ class Paperbase extends React.Component {
   switchView(id) {
     if (id === "Sign Out") {
       const {client} = this.props;
-      client.resetStore(); // yeet cache
+      const cookies = new Cookies();
+
+      cookies.remove('token');
       localStorage.removeItem('token');
+      client.resetStore(); // yeet cache
+
       id='Sign In';
     }
     this.setState({

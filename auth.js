@@ -2,9 +2,11 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const crypto = require("crypto");
+const {AuthenticationError} = require('apollo-server-koa');
+const Cookies = require('universal-cookie');
+
 const {getUserByUsername, getUserById, addUser} = require('./db');
 const {KEY_PATH} = require('./config.js');
-const {AuthenticationError} = require('apollo-server-koa');
 
 function comparePass(userPassword, databasePassword) {
   return bcrypt.compareSync(userPassword, databasePassword);
@@ -29,9 +31,9 @@ generateToken = async (username, password) => {
 };
 
 loadUser = async (ctx, next) => {
+  const {cookies} = new Cookies(ctx.request.headers.cookie);
   try {
-    const loadedToken = ctx.req.headers.token || ctx.session.token;
-    console.log('$$$$$$$', ctx.session);
+    const loadedToken = ctx.req.headers.token || cookies.token;
     const token = jwt.verify(loadedToken, loadKey());
     ctx.state.user = await getUserById(token.id);
   } catch(err) {}

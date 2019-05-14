@@ -89,12 +89,7 @@ const resolvers = {
     me: requiresLogin((_, __, ctx) => ({
       username: ctx.state.user ? ctx.state.user.username : '',
     })),
-    login: (_, {username, password}, ctx) => {
-      const token = generateToken(username, password);
-      ctx.cookies.set('token', token);
-      // ctx.session.token = token;
-      return {token};
-    },
+    login: (_, {username, password}) => ({token:generateToken(username, password)}),
     fileHistory: requiresLogin((_, {fileID}) => getDownloadHistory(fileID)),
     getOTP: requiresLogin((_, {fileID}) => getOTP(fileID)),
   },

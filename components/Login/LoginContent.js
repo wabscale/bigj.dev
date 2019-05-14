@@ -10,6 +10,7 @@ import {LOGIN} from '../queries';
 import {ApolloConsumer} from 'react-apollo';
 import Chip from '@material-ui/core/Chip';
 import Grow from '@material-ui/core/Grow';
+import Cookies from 'universal-cookie';
 
 const styles = theme => ({
   container: {
@@ -78,11 +79,14 @@ class LoginContent extends React.PureComponent {
   login(client) {
     const {username, password} = this.state;
     const {switchView} = this.props;
+    const cookies = new Cookies();
     client.query({
       query: LOGIN,
       variables: {username, password}
     }).then(({data}) => {
-      localStorage.setItem('token', data['login']['token']);
+      const {token} = data.login;
+      localStorage.setItem('token', token);
+      cookies.set('token', token);
       switchView("View");
     }).catch(e => {
       console.log(e);
