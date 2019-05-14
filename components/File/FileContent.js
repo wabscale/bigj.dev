@@ -132,7 +132,14 @@ class FileContent extends Component {
   };
 
   update = async () => {
-    this.forceUpdate();
+    const {client} = this.props;
+    client.query({
+      query: GET_FILES,
+      fetchPolicy: 'no-cache'
+    }).then(({data}) => {
+      if (data.files)
+        this.setState({files: data.files,});
+    });
   };
 
   handleNext = () => {
@@ -219,24 +226,23 @@ class FileContent extends Component {
                 );
               }
 
-              const files = data.files.map(
+              if (data.files === undefined) {
+                return <div />;
+              }
+
+              const newFiles = data.files.map(
                 ({fileID, filename, isPublic}) => ({fileID: parseInt(fileID), filename, isPublic})
               );
 
               if (this.state.files.length === 0)
-                this.state.files = files;
-              else
-                files.forEach(file => {
-                  if (this.state.files.findIndex(other => other.fileID === file.fileID) === -1) {
-                    this.state.files.push(file);
-                  }
-                });
+                this.state.files = newFiles;
+              const {files} = this.state;
 
-              this.state.files.sort(
+              files.sort(
                 (a, b) => (a.fileID < b.fileID ? 1 : a.fileID > b.fileID ? -1 : 0)
               );
 
-              const displayFiles = this.state.files.filter(file => (
+              const displayFiles = files.filter(file => (
                 searchTerm.length === 0 || file.filename.toLowerCase().includes(searchTerm.toLowerCase())
               ));
               this.state.fileCount = displayFiles.length;
@@ -252,8 +258,6 @@ class FileContent extends Component {
 
               const {fileCount} = this.state;
               const steps = Math.ceil(fileCount / displayCount);
-
-              console.log('yeeet')
 
               return (
                 <Fragment>

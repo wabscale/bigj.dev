@@ -104,7 +104,7 @@ class File extends PureComponent {
       <Grow
         in={display}
         style={{transformOrigin: '0 0 0'}}
-        timeout={(index+1) * 400}
+        timeout={(index+1) * 150}
         key={`file_${fileID}_grow`}
         // mountOnEnter
         unmountOnExit
