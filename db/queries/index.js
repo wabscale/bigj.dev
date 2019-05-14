@@ -24,7 +24,7 @@ module.exports = {
   },
   getConfig: async (key) => {
     let values = await db.Config.findAll({where: {key,}});
-    return values.length >= 1 ? values : null;
+    return values.length >= 1 ? values[0] : null;
   },
   getDownloadHistory: async (fileID) => (
     await db.DownloadHistory.findAll({
