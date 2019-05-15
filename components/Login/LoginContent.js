@@ -69,11 +69,9 @@ class LoginContent extends React.PureComponent {
     this.state = {
       username: '',
       password: '',
-      unauth: false,
+      hasAttemptedLogin: false,
     };
     this.login = this.login.bind(this);
-
-
   }
 
   login(client) {
@@ -90,20 +88,20 @@ class LoginContent extends React.PureComponent {
       switchView("View");
     }).catch(e => {
       console.log(e);
-      this.setState({unauth: true});
+      this.setState({hasAttemptedLogin: true});
     });
   }
 
   render() {
-    const {classes, switchView} = this.props;
-    const {username, password, unauth} = this.state;
+    const {classes} = this.props;
+    const {username, password, hasAttemptedLogin} = this.state;
 
     return (
       <Grid container spacing={24} alignItems="center" justify="center" direction="column">
         {
-          unauth ? (
+          hasAttemptedLogin ? (
             <Grow
-              in={unauth}
+              in={hasAttemptedLogin}
               timeout={250}
               unmountOnExit
             >
@@ -112,7 +110,7 @@ class LoginContent extends React.PureComponent {
                   label="Invalid Credentials"
                   className={classes.paper}
                   color="secondary"
-                  onDelete={() => this.setState({unauth: false})}
+                  onDelete={() => this.setState({hasAttemptedLogin: false})}
                 />
               </Grid>
             </Grow>
