@@ -1,10 +1,23 @@
 version: '2'
 
 services:
+  traefik:
+    image: traefik
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      #- "./acme.json:/etc/traefik/acme/acme.json"
+      - "./traefik.toml:/etc/traefik/traefik.toml"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    labels:
+      - "traefik.enable=true"
+      # - "traefik.frontend.rule=Host:traefik.bigj.info"
+
   db:
     image: mariadb:10.4
-    ports:
-      - "127.0.0.1:3306:3306"
+    # ports:
+    #   - "127.0.0.1:3306:3306"
     environment:
       - "MYSQL_ROOT_PASSWORD=password"
       - "MYSQL_DATABASE=db"
@@ -12,3 +25,31 @@ services:
       - "./.data/mysql:/var/lib/mysql"
     labels:
       - "traefik.enable=false"
+
+  base:
+    build: .
+    image: dev.base
+    environment:
+      - "NODE_ENV=production"
+
+  api:
+    image: dev.base
+    entrypoint: "npm run api"
+    environment:
+      - "PORT=5000"
+      - "NODE_ENV=production"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=5000"
+      - "traefik.frontend.rule=Host:api.bigj.info"
+
+  static:
+    image: dev.base
+    entrypoint: "npm run start"
+    environment:
+      - "PORT=5000"
+      - "NODE_ENV=production"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=5000"
+      - "traefik.frontend.rule=Host:f.bigj.info"

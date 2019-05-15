@@ -1,8 +1,9 @@
 const fs = require('fs');
 const path = require('path')
 
+const {NODE_ENV} = process.env;
+
 const config = {
-  KEY_PATH: '.data/site.key',
   UPLOAD_PATH: path.join(__dirname, '.data/files/'),
 };
 

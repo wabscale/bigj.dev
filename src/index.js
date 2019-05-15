@@ -39,9 +39,8 @@ app.use(cors({
 app.use(require('./routes/index').routes());
 app.use(require('./routes/files').routes());
 // server
-const server = app.listen(PORT, () => {
-  console.log(`Server listening on port: ${PORT}`);
-  console.log(`http://localhost:${PORT}/`);
-});
+const server = app.listen(PORT, '0.0.0.0');
+
+console.log(`Server listening on port: ${PORT}`);
 
 module.exports = server;
