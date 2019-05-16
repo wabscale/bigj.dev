@@ -80,7 +80,11 @@ handleUpload = async (file) => {
   await storeFS({stream, filename});
   await addFile({filename});
   return { filename, mimetype, encoding };
-}
+};
+
+transformDownloadHistory = async (records) => (
+  (await records).map(({ipAddress, createdAt, allowed}) => ({ipAddress, time: createdAt, allowed}))
+);
 
 const resolvers = {
   Query: {
@@ -90,7 +94,7 @@ const resolvers = {
       username: ctx.state.user ? ctx.state.user.username : '',
     })),
     login: (_, {username, password}) => ({token:generateToken(username, password)}),
-    fileHistory: requiresLogin((_, {fileID}) => getDownloadHistory(fileID)),
+    fileHistory: requiresLogin((_, {fileID}) => transformDownloadHistory(getDownloadHistory(fileID))),
     getOTP: requiresLogin((_, {fileID}) => getOTP(fileID)),
   },
   Mutation: {

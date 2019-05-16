@@ -27,6 +27,7 @@ export const GET_DOWNLOAD_HISTORY = gql`
     fileHistory(fileID: $fileID) {
       ipAddress
       time
+      allowed
     }
   }
 `;

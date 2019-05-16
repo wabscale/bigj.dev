@@ -5,6 +5,7 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {withStyles} from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
 import PropTypes from 'prop-types';
 import {Query} from 'react-apollo';
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -50,7 +51,13 @@ class FileExpand extends React.Component {
                       mountOnEnter
                       unmountOnExit
                     >
-                      {reshape(data)}
+                      <Grid container spacing={0}>
+                        {reshape(data).map((element, index) => (
+                          <Grid item xs={12} key={index}>
+                            {element}
+                          </Grid>
+                        ))}
+                      </Grid>
                     </Grow>
                   );
                 }}

@@ -37,6 +37,7 @@
     "mysql2": "^1.6.5",
     "pug": "^2.0.3",
     "react-apollo": "^2.5.5",
+    "react-scroll": "^1.7.11",
     "sequelize": "^5.8.5",
     "sequelize-cli": "^5.4.0",
     "universal-cookie": "^4.0.0"

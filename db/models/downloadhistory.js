@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
   const DownloadHistory = sequelize.define('DownloadHistory', {
     fileID: DataTypes.INTEGER,
     ipAddress: DataTypes.STRING,
-    time: DataTypes.TIME,
+    // time: DataTypes.TIME,
     allowed: DataTypes.BOOLEAN,
   }, {});
   DownloadHistory.associate = function(models) {

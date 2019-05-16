@@ -79,24 +79,6 @@ module.exports = {
           });
         });
       });
-
-      this.plugin('done', async stats => {
-        await new Promise((resolve, reject) => {
-          fs.readFile(path.resolve(__dirname, 'src/views/login.base.pug'), (err, data) => {
-            if (err) return reject(err);
-
-            return resolve(data
-            .toString('utf8')
-            .replace('__SCRIPT__', 'login.' + stats.hash + '.js'));
-          });
-        }).catch(err => {
-          console.log(err);
-        }).then(template => {
-          fs.writeFile(path.resolve(__dirname, 'src/views/login.pug'), template, err => {
-            if (err) throw err;
-          });
-        });
-      });
     },
   ],
 };

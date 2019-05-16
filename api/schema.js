@@ -54,6 +54,7 @@ const typeDefs = gql`
   type FileHistory {
     ipAddress: String!
     time: String!
+    allowed: Boolean!
   }
 
   type OTP {

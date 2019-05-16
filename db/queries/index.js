@@ -29,7 +29,7 @@ module.exports = {
   getDownloadHistory: async (fileID) => (
     await db.DownloadHistory.findAll({
       where: {fileID},
-      attributes: ['fileID', 'ipAddress', 'time']
+      attributes: ['ipAddress', 'createdAt', 'allowed']
     })
   ),
   getOTP: async (fileID) => {

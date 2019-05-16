@@ -6,6 +6,7 @@ const session = require('koa-session');
 const convert = require('koa-convert');
 const helmet = require('koa-helmet');
 const cors = require('@koa/cors');
+const crypto = require('crypto');
 
 const {server} = require('./schema');
 const files = require('./files');
@@ -14,7 +15,13 @@ const {loadUser} = require('../auth');
 const PORT = process.env.PORT || '8080';
 const app = new Koa();
 
-app.keys = ['DEBUG', 'DEBUG'];
+if (process.env.NODE_ENV === 'production')
+  app.keys = [
+    crypto.randomBytes(32).toString('hex'),
+    crypto.randomBytes(32).toString('hex')
+  ];
+else
+  app.keys = ['DEBUG', 'DEBUG'];
 app.use(loadUser);
 app.use(convert(session(app)));
 app.use(helmet());

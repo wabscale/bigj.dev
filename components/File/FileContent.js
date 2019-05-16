@@ -21,6 +21,7 @@ import MobileStepper from '@material-ui/core/MobileStepper';
 import Button from '@material-ui/core/Button';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
+import { animateScroll } from "react-scroll";
 
 import {GET_FILE, GET_FILES, UPLOAD_FILE} from '../queries';
 import File from './File';
@@ -118,6 +119,7 @@ class FileContent extends Component {
       files: [],
       activeStep: 0,
       fileCount: 0,
+      moving: false
     };
     this.deleteFile = this.deleteFile.bind(this);
     // this.uploadFile = this.uploadFile.bind(this);
@@ -142,13 +144,22 @@ class FileContent extends Component {
     });
   };
 
-  handleNext = () => {
+  moveToTop() {
+    return new Promise((resolve) => {
+      animateScroll.scrollToTop();
+      return resolve();
+    });
+  }
+
+  handleNext = async () => {
+    await this.moveToTop();
     this.setState(state => ({
       activeStep: state.activeStep + 1,
     }));
   };
 
-  handleBack = () => {
+  handleBack = async () => {
+    await this.moveToTop();
     this.setState(state => ({
       activeStep: state.activeStep - 1,
     }));
@@ -156,7 +167,9 @@ class FileContent extends Component {
 
   render() {
     const {classes, switchView, displayCount} = this.props;
-    const {searchTerm, activeStep} = this.state;
+    const {searchTerm, activeStep, moving} = this.state;
+    const {fileCount} = this.state;
+    const steps = Math.ceil(fileCount / displayCount);
 
     return (
       <Fragment>
@@ -213,7 +226,7 @@ class FileContent extends Component {
           </Grid>
           <Query query={GET_FILES} fetchPolicy='network-only'>
             {({data, loading, error}) => {
-              if (loading)
+              if (loading || moving)
                 return (
                   <Grid item xs={12}>
                     <CircularProgress className={classes.progress}/>
@@ -245,7 +258,6 @@ class FileContent extends Component {
               const displayFiles = files.filter(file => (
                 searchTerm.length === 0 || file.filename.toLowerCase().includes(searchTerm.toLowerCase())
               ));
-              this.state.fileCount = displayFiles.length;
 
               if (displayFiles.length === 0)
                 return (
@@ -256,8 +268,9 @@ class FileContent extends Component {
                   </Paper>
                 );
 
-              const {fileCount} = this.state;
-              const steps = Math.ceil(fileCount / displayCount);
+              setTimeout(() => this.setState({
+                fileCount: displayFiles.length,
+              }), 1000);
 
               return (
                 <Fragment>
@@ -272,43 +285,43 @@ class FileContent extends Component {
                       index={index}
                     />
                   ))}
-                  <Grid item xs={12}>
-                    <MobileStepper
-                      variant="dots"
-                      steps={steps}
-                      position="static"
-                      activeStep={this.state.activeStep}
-                      className={classes.root}
-                      nextButton={
-                        <Button
-                          size="small"
-                          onClick={this.handleNext}
-                          disabled={this.state.activeStep === steps}
-                          color={"primary"}
-                          variant="contained"
-                        >
-                          Next
-                          <KeyboardArrowRight/>
-                        </Button>
-                      }
-                      backButton={
-                        <Button
-                          size="small"
-                          onClick={this.handleBack}
-                          disabled={this.state.activeStep === 0}
-                          color={"primary"}
-                          variant="contained"
-                        >
-                          <KeyboardArrowLeft/>
-                          Back
-                        </Button>
-                      }
-                    />
-                  </Grid>
                 </Fragment>
               );
             }}
           </Query>
+          <Grid item xs={12}>
+            <MobileStepper
+              variant="dots"
+              steps={steps}
+              position="bottom"
+              activeStep={this.state.activeStep}
+              className={classes.root}
+              nextButton={
+                <Button
+                  size="small"
+                  onClick={this.handleNext}
+                  disabled={this.state.activeStep === steps}
+                  color={"primary"}
+                  variant="contained"
+                >
+                  Next
+                  <KeyboardArrowRight/>
+                </Button>
+              }
+              backButton={
+                <Button
+                  size="small"
+                  onClick={this.handleBack}
+                  disabled={this.state.activeStep === 0}
+                  color={"primary"}
+                  variant="contained"
+                >
+                  <KeyboardArrowLeft/>
+                  Back
+                </Button>
+              }
+            />
+          </Grid>
         </Grid>
       </Fragment>
     );

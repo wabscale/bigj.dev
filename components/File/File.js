@@ -11,6 +11,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import SaveIcon from '@material-ui/icons/Save';
 import FileExpand from './FileExpand';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
+import DoneIcon from '@material-ui/icons/Done';
+import ErrorIcon from '@material-ui/icons/Error';
 import Switch from '@material-ui/core/Switch';
 import Link from '@material-ui/core/Link';
 import PropTypes from "prop-types";
@@ -46,6 +48,11 @@ const styles = theme => ({
   contentWrapper: {
     margin: '40px 16px',
   },
+  align: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+  }
 });
 
 class File extends PureComponent {
@@ -104,12 +111,12 @@ class File extends PureComponent {
       <Grow
         in={display}
         style={{transformOrigin: '0 0 0'}}
-        timeout={(index+1) * 150}
+        timeout={(index + 1) * 150}
         key={`file_${fileID}_grow`}
         // mountOnEnter
         unmountOnExit
       >
-        <Grid item key={`file_${fileID}`}>
+        <Grid item key={`file_${fileID}`} lg={4} md={4} sm={12}>
           <Paper className={classes.paper}>
             <Fragment>
               <AppBar className={classes.searchBar} position="static" color="default" elevation={0}>
@@ -189,13 +196,34 @@ class File extends PureComponent {
                   heading="History"
                   query={GET_DOWNLOAD_HISTORY}
                   args={{fileID}}
-                  reshape={data => (
-                    <Typography>
-                      {data.fileHistory.map(({ipAddress, time}) => (
-                        ipAddress + time
-                      )).join('\n') || ''}
-                    </Typography>
-                  )}
+                  reshape={data => data.fileHistory.slice(0, 10).map(({ipAddress, time, allowed}) => {
+                    const datetime = new Date(0);
+                    datetime.setUTCMilliseconds(time);
+                    const trimmedIPAddress = ipAddress.substr(ipAddress.lastIndexOf(':') + 1);
+                    return (
+                      <Grid container spacing={8} key={`historyItem-${time}`}>
+                        <Grid item xs={3} key={"ip"}>
+                          <Typography>
+                            {trimmedIPAddress}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={7} key={"date"}>
+                          <Typography>
+                            {datetime.toLocaleString()}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={2} key={"icon"}>
+                          <Tooltip title={`Download was ${allowed ? "" : "not"} allowed`}>
+                            <IconButton color={"secondary"}>
+                            {allowed
+                              ? <DoneIcon color="primary" className={classes.icon}/>
+                              : <ErrorIcon color="error" className={classes.icon}/>}
+                            </IconButton>
+                          </Tooltip>
+                        </Grid>
+                      </Grid>
+                    );
+                  })}
                 />
                 <FileExpand
                   heading="One Time Password"

@@ -1,14 +1,23 @@
 const Koa = require('koa');
-const koaviews = require('koa-views');
+const koaViews = require('koa-views');
 const logger = require('koa-logger');
 const cors = require('@koa/cors');
 const helmet = require('koa-helmet');
 const session = require('koa-session');
 const bodyParser = require('koa-bodyparser');
+const crypto = require('crypto');
 const {loadUser} = require('../auth');
 
 const app = new Koa();
 const PORT = process.env.PORT || 5000;
+
+if (process.env.NODE_ENV === 'production')
+  app.keys = [
+    crypto.randomBytes(32).toString('hex'),
+    crypto.randomBytes(32).toString('hex')
+  ];
+else
+  app.keys = ['DEBUG', 'DEBUG'];
 
 app.use(session({key: 'debug'}, app));
 app.use(bodyParser({
@@ -17,7 +26,7 @@ app.use(bodyParser({
 }));
 
 // Must be used before any router is used
-app.use(koaviews(__dirname + '/views', {
+app.use(koaViews(__dirname + '/views', {
   extension: 'pug',
   map: {
     html: 'pug'
