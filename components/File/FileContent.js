@@ -21,7 +21,7 @@ import MobileStepper from '@material-ui/core/MobileStepper';
 import Button from '@material-ui/core/Button';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
-import { animateScroll } from "react-scroll";
+import {animateScroll} from "react-scroll";
 
 import {GET_FILE, GET_FILES, UPLOAD_FILE} from '../queries';
 import File from './File';
@@ -61,6 +61,11 @@ const styles = theme => ({
   },
   button: {
     margin: theme.spacing.unit,
+  },
+  stepper: {
+    maxWidth: "100%",
+    flexGrow: 1,
+    position: "relative"
   },
 });
 
@@ -122,7 +127,6 @@ class FileContent extends Component {
       moving: false
     };
     this.deleteFile = this.deleteFile.bind(this);
-    // this.uploadFile = this.uploadFile.bind(this);
     this.update = this.update.bind(this);
   }
 
@@ -200,8 +204,8 @@ class FileContent extends Component {
                             accept="*"
                             className={classes.input}
                             id="icon-button-file"
-                            onChange={({ target: { validity, files } }) =>
-                              validity.valid && uploadFile({ variables: { file:files[0] } })
+                            onChange={({target: {validity, files}}) =>
+                              validity.valid && uploadFile({variables: {file: files[0]}})
                             }
                             type="file"
                             hidden
@@ -240,7 +244,7 @@ class FileContent extends Component {
               }
 
               if (data.files === undefined) {
-                return <div />;
+                return <div/>;
               }
 
               const newFiles = data.files.map(
@@ -295,7 +299,7 @@ class FileContent extends Component {
               steps={steps}
               position="bottom"
               activeStep={this.state.activeStep}
-              className={classes.root}
+              className={classes.stepper}
               nextButton={
                 <Button
                   size="small"

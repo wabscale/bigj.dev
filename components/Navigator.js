@@ -33,6 +33,9 @@ const categories = [
 ];
 
 const styles = theme => ({
+  root: {
+    margin: theme.spacing.unit,
+  },
   categoryHeader: {
     paddingTop: 16,
     paddingBottom: 16,
@@ -84,7 +87,7 @@ function Navigator(props) {
   const {classes, onDrawerToggle, switchView, api, ...other} = props;
 
   return (
-    <Drawer variant="permanent" {...other} onClose={onDrawerToggle}>
+    <Drawer variant="permanent" {...other} onClose={onDrawerToggle} className={classes.root}>
       <List disablePadding>
         <ListItem className={classNames(classes.firebase, classes.item, classes.itemCategory)}>
           <IconButton

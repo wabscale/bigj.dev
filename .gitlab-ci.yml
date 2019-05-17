@@ -1,0 +1,12 @@
+stages:
+  - deploy
+
+build_jnet:
+  stage: deploy
+  tags:
+    - server-tag
+  script:
+    - ./deploy.sh
+  only:
+    refs:
+      - master

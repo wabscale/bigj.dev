@@ -67,45 +67,9 @@ function Header(props) {
               </Grid>
             </Hidden>
             <Grid item xs/>
-            {/*<Grid item>*/}
-            {/*  <Button href="/auth/logout" variant="contained" color="default" className={classes.button}>*/}
-            {/*    <Typography color="inherit" variant="p" className={classes.leftIcon}>*/}
-            {/*      Sign Out*/}
-            {/*    </Typography>*/}
-            {/*    <FontAwesomeIcon icon={faSignOutAlt}/>*/}
-            {/*  </Button>*/}
-            {/*</Grid>*/}
           </Grid>
         </Toolbar>
       </AppBar>
-      {/*<AppBar*/}
-      {/*  component="div"*/}
-      {/*  className={classes.secondaryBar}*/}
-      {/*  color="primary"*/}
-      {/*  position="static"*/}
-      {/*  elevation={0}*/}
-      {/*>*/}
-      {/*  <Toolbar>*/}
-      {/*    <Grid container alignItems="center" spacing={8}>*/}
-      {/*      <Grid item xs>*/}
-      {/*        <Typography color="inherit" variant="h5">*/}
-      {/*          Files*/}
-      {/*        </Typography>*/}
-      {/*      </Grid>*/}
-      {/*    </Grid>*/}
-      {/*  </Toolbar>*/}
-      {/*</AppBar>*/}
-      {/*<AppBar*/}
-      {/*  component="div"*/}
-      {/*  className={classes.secondaryBar}*/}
-      {/*  color="primary"*/}
-      {/*  position="static"*/}
-      {/*  elevation={0}*/}
-      {/*>*/}
-      {/*  <Tabs value={0} textColor="inherit">*/}
-      {/*    <Tab textColor="inherit" label="View"/>*/}
-      {/*  </Tabs>*/}
-      {/*</AppBar>*/}
     </React.Fragment>
   );
 }
