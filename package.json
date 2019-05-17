@@ -7,7 +7,8 @@
     "start": "nodemon --harmony src/index",
     "build": "webpack",
     "watch": "webpack --watch --progress --info-verbosity verbose",
-    "api": "nodemon ./api/index.js"
+    "api": "nodemon ./api/index.js",
+    "migrate": "cd db && sequelize db:migrate"
   },
   "repository": {
     "type": "git",
