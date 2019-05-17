@@ -10,6 +10,10 @@ if [[ ! which sequelize ]]; then
   npm install -g sequelize mysql2
 fi
 
+if [[ ! docker network ls | grep "traefik-proxy" ]]; then
+  docker network create traefik-proxy
+fi
+
 docker-compose build --no-cache
 docker-compose kill
 docker-compose rm -f

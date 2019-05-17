@@ -12,6 +12,8 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock"
     labels:
       - "traefik.enable=false"
+    networks:
+      - traefik-proxy
 
   db:
     image: mariadb:10.4
@@ -24,6 +26,8 @@ services:
       - "/var/lib/mysql:/var/lib/mysql"
     labels:
       - "traefik.enable=false"
+    networks:
+      - traefik-proxy
 
   base:
     build: .
@@ -43,6 +47,8 @@ services:
       - "traefik.frontend.rule=Host:api.bigj.info"
     volumes:
       - "$UPLOAD_PATH:/opt/app/.data/"
+    networks:
+      - traefik-proxy
 
   static:
     image: info.base
@@ -56,3 +62,10 @@ services:
       - "traefik.frontend.rule=Host:f.bigj.info"
     volumes:
       - "$UPLOAD_PATH:/opt/app/.data/"
+    networks:
+      - traefik-proxy
+
+networks:
+  traefik-proxy:
+    external:
+      name: traefik-proxy
