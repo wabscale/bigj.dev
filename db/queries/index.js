@@ -1,7 +1,7 @@
 const db = require('../models');
 const bcrypt = require('bcryptjs');
 var crypto = require("crypto");
-
+const {DOMAIN} = require('../../config')
 
 module.exports = {
   // get
@@ -37,7 +37,7 @@ module.exports = {
     const file = await db.File.findAll({where:{id:fileID}});
     await db.OTP.create({otp, fileID});
     return {
-      otp: `http://f.bigj.dev/f/${file[0].filename}?otp=${otp}`,
+      otp: `${DOMAIN}/f/${file[0].filename}?otp=${otp}`,
     };
   },
 

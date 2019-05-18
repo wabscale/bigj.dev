@@ -11,7 +11,7 @@ const {
 const {generateToken} = require('../auth');
 const {AuthenticationError} = require('apollo-server-koa');
 const fs = require('fs');
-const {UPLOAD_PATH} = require('../config');
+const {UPLOAD_PATH, DOMAIN} = require('../config');
 
 const requiresLogin = resolver => (parent, args, ctx, info) => {
   if (ctx.state.user)
