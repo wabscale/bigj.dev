@@ -26,7 +26,7 @@ const typeDefs = gql`
       isPublic: Boolean!
     ): File!
     deleteFile(fileID: ID!): File!
-    register(username: String!, password: String!): Token!
+    """register(username: String!, password: String!): Token!"""
     singleUpload(file: Upload!): UploadFile!
   }
 

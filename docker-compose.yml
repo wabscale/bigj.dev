@@ -21,7 +21,7 @@ services:
       - "127.0.0.1:3306:3306"
     environment:
       - "MYSQL_ROOT_PASSWORD=password"
-      - "MYSQL_DATABASE=info"
+      - "MYSQL_DATABASE=dev"
     volumes:
       - "./.data/mysql:/var/lib/mysql"
     labels:
@@ -47,7 +47,7 @@ services:
       - "traefik.port=5000"
       - "traefik.frontend.rule=Host:api.bigj.dev"
     volumes:
-      - "$UPLOAD_PATH:/opt/app/.data/"
+      - "$UPLOAD_PATH:/opt/app/.data/files"
     networks:
       - traefik-proxy
 
@@ -62,7 +62,7 @@ services:
       - "traefik.port=5000"
       - "traefik.frontend.rule=Host:f.bigj.dev"
     volumes:
-      - "$UPLOAD_PATH:/opt/app/.data/"
+      - "$UPLOAD_PATH:/opt/app/.data/files"
     networks:
       - traefik-proxy
 

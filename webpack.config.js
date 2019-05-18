@@ -4,11 +4,13 @@ const path = require('path');
 const webpack = require('webpack');
 
 OUT_DIR = 'src/';
+API_HOST=JSON.stringify(process.env.API_HOST || 'http://api.localhost:8080/graphql')
 
 if (!process.env.NODE_ENV)
   process.env.NODE_ENV = 'development';
 
 console.log('NODE_ENV: ' + process.env.NODE_ENV);
+console.log('API_HOST: ' + API_HOST)
 
 module.exports = {
   mode: process.env.NODE_ENV,
@@ -59,7 +61,7 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      APIHOST: JSON.stringify(process.env.APIHOST || 'http://api.localhost:8080/graphql'),
+      API_HOST,
     }),
     function () {
       this.plugin('done', async stats => {

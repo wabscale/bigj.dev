@@ -98,7 +98,7 @@ function Navigator(props) {
           >
             <MenuIcon/>
           </IconButton>
-          bigj.info
+          bigj.dev
         </ListItem>
         <ListItem className={classNames(classes.item, classes.itemCategory)}>
           <ListItemIcon>

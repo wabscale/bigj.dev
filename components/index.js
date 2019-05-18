@@ -22,7 +22,7 @@ const defaultOptions = {
 
 const client = new ApolloClient({
   link: createUploadLink({
-    uri: APIHOST,
+    uri: API_HOST,
     credentials: 'same-origin',
     fetch: authFetch,
   }),

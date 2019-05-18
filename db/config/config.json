@@ -2,7 +2,7 @@
   "development": {
     "username": "root",
     "password": "password",
-    "database": "info",
+    "database": "dev",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
@@ -16,7 +16,7 @@
   "production": {
     "username": "root",
     "password": "password",
-    "database": "info",
+    "database": "dev",
     "host": "db",
     "dialect": "mysql"
   }
