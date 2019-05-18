@@ -80,7 +80,8 @@ class LoginContent extends React.PureComponent {
     const cookies = new Cookies();
     client.query({
       query: LOGIN,
-      variables: {username, password}
+      variables: {username, password},
+      fetchPolicy: 'no-cache',
     }).then(({data}) => {
       const {token} = data.login;
       localStorage.setItem('token', token);

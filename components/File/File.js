@@ -229,21 +229,21 @@ class File extends PureComponent {
                   heading="One Time Password"
                   query={GET_OTP}
                   args={{fileID}}
-                  reshape={data => (
+                  reshape={data => [
                     <Link href={data.getOTP.otp}>
                       {data.getOTP.otp}
                     </Link>
-                  )}
+                  ]}
                 />
                 <FileExpand
                   heading="Details"
                   query={GET_FILE_SIZE}
                   args={{fileID}}
-                  reshape={data => (
+                  reshape={data => [
                     <Typography>
                       {this.humanSize(data.file.size)}
                     </Typography>
-                  )}
+                  ]}
                 />
               </div>
             </Fragment>
