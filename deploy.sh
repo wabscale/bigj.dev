@@ -2,6 +2,8 @@
 
 set -e
 
+export UPLOAD_PATH=/home/jc/uploads
+
 if ! which mysqladmin; then
   sudo apt update && sudo apt install -y mysql-client
 fi
