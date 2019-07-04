@@ -1,3 +1,8 @@
+const fs = require('fs');
+const path = require('path');
+const {generateToken} = require('../auth');
+const {AuthenticationError} = require('apollo-server-koa');
+const {UPLOAD_PATH, DOMAIN} = require('../config');
 const {
   getFiles,
   addUser,
@@ -8,10 +13,6 @@ const {
   deleteFileById,
   addFile
 } = require('../db');
-const {generateToken} = require('../auth');
-const {AuthenticationError} = require('apollo-server-koa');
-const fs = require('fs');
-const {UPLOAD_PATH, DOMAIN} = require('../config');
 
 const requiresLogin = resolver => (parent, args, ctx, info) => {
   if (ctx.state.user)
@@ -58,7 +59,7 @@ yeetFile = async (id) => {
   return fileReducer(file);
 };
 
-const storeFS = ({ stream, filename }) => {
+const storeFS = ({stream, filename}) => {
   const path = `${UPLOAD_PATH}/${filename}`;
   return new Promise((resolve, reject) =>
     stream
@@ -66,25 +67,37 @@ const storeFS = ({ stream, filename }) => {
         if (stream.truncated)
         // Delete the truncated file.
           fs.unlinkSync(path);
-        reject(error)
+        reject(error);
       })
       .pipe(fs.createWriteStream(path))
       .on('error', error => reject(error))
-      .on('finish', () => resolve({ path }))
-  )
-}
+      .on('finish', () => resolve({path}))
+  );
+};
 
 handleUpload = async (file) => {
-  const { createReadStream, filename, mimetype, encoding } = await file;
+  const {createReadStream, filename, mimetype, encoding} = await file;
   const stream = createReadStream();
   await storeFS({stream, filename});
   await addFile({filename});
-  return { filename, mimetype, encoding };
+  return {filename, mimetype, encoding};
 };
 
 transformDownloadHistory = async (records) => (
   (await records).map(({ipAddress, createdAt, allowed}) => ({ipAddress, time: createdAt, allowed}))
 );
+
+const handleFileUpdate = async file => {
+  console.log('sanity check');
+  const currentFile = await getFileById(file.fileID);
+  if (currentFile) {
+    await updateFile(file);
+    if (currentFile.filename !== file.filename) {
+      fs.renameSync(path.join(UPLOAD_PATH, currentFile.filename), path.join(UPLOAD_PATH, file.filename));
+    }
+    return file;
+  }
+};
 
 const resolvers = {
   Query: {
@@ -93,12 +106,12 @@ const resolvers = {
     me: requiresLogin((_, __, ctx) => ({
       username: ctx.state.user ? ctx.state.user.username : '',
     })),
-    login: (_, {username, password}) => ({token:generateToken(username, password)}),
+    login: (_, {username, password}) => ({token: generateToken(username, password)}),
     fileHistory: requiresLogin((_, {fileID}) => transformDownloadHistory(getDownloadHistory(fileID))),
     getOTP: requiresLogin((_, {fileID}) => getOTP(fileID)),
   },
   Mutation: {
-    updateFile: requiresLogin((_, {fileID, filename, isPublic}) => updateFile({fileID, filename, isPublic})),
+    updateFile: requiresLogin((_, {fileID, filename, isPublic}) => handleFileUpdate({fileID, filename, isPublic})),
     // register: (_, {username, password}) => createUser(username, password),
     deleteFile: requiresLogin((_, {fileID}) => yeetFile(fileID)),
     singleUpload: requiresLogin(async (_, {file}) => handleUpload(file)),

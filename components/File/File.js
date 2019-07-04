@@ -43,7 +43,7 @@ const styles = theme => ({
     display: 'block',
   },
   addUser: {
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing(1),
   },
   contentWrapper: {
     margin: '40px 16px',
@@ -123,7 +123,7 @@ class File extends PureComponent {
                 <Toolbar>
                   <Grid
                     container
-                    spacing={16}
+                    spacing={2}
                     alignItems="center"
                     key={`file_${fileID}_toolbar`}
                   >
@@ -196,12 +196,12 @@ class File extends PureComponent {
                   heading="History"
                   query={GET_DOWNLOAD_HISTORY}
                   args={{fileID}}
-                  reshape={data => data.fileHistory.slice(0, 10).map(({ipAddress, time, allowed}) => {
+                  reshape={data => data.fileHistory.slice(-10).map(({ipAddress, time, allowed}) => {
                     const datetime = new Date(0);
                     datetime.setUTCMilliseconds(time);
                     const trimmedIPAddress = ipAddress.substr(ipAddress.lastIndexOf(':') + 1);
                     return (
-                      <Grid container spacing={8} key={`historyItem-${time}`}>
+                      <Grid container spacing={1} key={`historyItem-${time}`}>
                         <Grid item xs={3} key={"ip"}>
                           <Typography>
                             {trimmedIPAddress}

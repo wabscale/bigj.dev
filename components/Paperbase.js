@@ -54,7 +54,7 @@ theme = {
     },
     MuiTabs: {
       root: {
-        marginLeft: theme.spacing.unit,
+        marginLeft: theme.spacing(1),
       },
       indicator: {
         height: 3,
@@ -81,7 +81,7 @@ theme = {
     },
     MuiIconButton: {
       root: {
-        padding: theme.spacing.unit,
+        padding: theme.spacing(1),
       },
     },
     MuiTooltip: {
@@ -126,6 +126,10 @@ theme = {
       minHeight: 48,
     },
   },
+};
+
+const uiBreakpoints = {
+  "mobile": {maxWidth: 550, maxHeight: 850, pixelDensity: 2}
 };
 
 const drawerWidth = 256;
@@ -178,12 +182,28 @@ class Paperbase extends React.Component {
       localStorage.removeItem('token');
       client.resetStore(); // yeet cache
 
-      id='Sign In';
+      id = 'Sign In';
     }
     this.setState({
       active: id,
     });
   }
+
+  isMobileUI = () => {
+    const {maxHeight: height, maxWidth: width, pixelDensity} = uiBreakpoints.mobile;
+
+    let currHeight, currWidth;
+
+    if (this.state) {
+      currWidth = this.state.width;
+      currHeight = this.state.height;
+    } else {
+      currWidth = window.innerWidth;
+      currHeight = window.innerHeight;
+    }
+
+    return currHeight <= height && currWidth < width && window.devicePixelRatio >= pixelDensity;
+  };
 
   render() {
     const {classes} = this.props;
@@ -209,24 +229,25 @@ class Paperbase extends React.Component {
                 PaperProps={{style: {width: drawerWidth}}}
                 switchView={this.switchView}
                 active={this.state.active}
+                onDrawerToggle={this.handleDrawerToggle}
               />
             </Hidden>
           </nav>
           <div className={classes.appContent}>
             <Header onDrawerToggle={this.handleDrawerToggle}/>
             <main className={classes.mainContent}>
-                {
-                  active === "View" ? <FileContent
+              {
+                active === "View" ? <FileContent
+                    switchView={this.switchView}
+                    style={{height: "100%", width: "100%"}}
+                    displayCount={9}
+                  /> :
+                  active === "Sign In" ? <LoginContent
                       switchView={this.switchView}
-                      style={{height:"100%",width:"100%"}}
-                      displayCount={9}
+                      style={{height: "100%", width: "100%"}}
                     /> :
-                    active === "Sign In" ? <LoginContent
-                        switchView={this.switchView}
-                        style={{height:"100%",width:"100%"}}
-                      /> :
-                      <Fragment/>
-                }
+                    <Fragment/>
+              }
             </main>
           </div>
         </div>

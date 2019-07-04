@@ -47,20 +47,20 @@ const styles = theme => ({
     display: 'block',
   },
   addUser: {
-    marginLeft: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
   },
   contentWrapper: {
     margin: '40px 16px',
   },
   progress: {
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing(1),
     align: 'center',
   },
   typography: {
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing(1),
   },
   button: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
   stepper: {
     maxWidth: "100%",
@@ -179,7 +179,7 @@ class FileContent extends Component {
       <Fragment>
         <Grid
           container
-          spacing={24}
+          spacing={3}
           direction="row"
           justify="center"
           alignItems="center"
@@ -189,7 +189,7 @@ class FileContent extends Component {
             <Paper className={classes.paper}>
               <AppBar className={classes.searchBar} position="static" color="default" elevation={0}>
                 <Toolbar>
-                  <Grid container spacing={16} alignItems="center">
+                  <Grid container spacing={2} alignItems="center">
                     <Grid item xs={12} key="searchBar">
                       <SearchBar classes={classes} onChange={searchTerm => {
                         this.setState({searchTerm: searchTerm, activeStep: 0});
@@ -228,7 +228,11 @@ class FileContent extends Component {
               </AppBar>
             </Paper>
           </Grid>
-          <Query query={GET_FILES} fetchPolicy='network-only'>
+          <Query
+            query={GET_FILES}
+            fetchPolicy={'no-cache'}
+            pollInterval={3000}
+          >
             {({data, loading, error}) => {
               if (loading || moving)
                 return (

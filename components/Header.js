@@ -5,9 +5,9 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faSignOutAlt} from "@fortawesome/free-solid-svg-icons/faSignOutAlt";
-import Button from '@material-ui/core/Button'
+import Button from '@material-ui/core/Button';
 import MenuIcon from '@material-ui/icons/Menu';
-import IconButton from '@material-ui/core/IconButton'
+import IconButton from '@material-ui/core/IconButton';
 import PropTypes from 'prop-types';
 import Hidden from '@material-ui/core/Hidden';
 import {withStyles} from '@material-ui/core/styles';
@@ -16,13 +16,13 @@ const lightColor = 'rgba(255, 255, 255, 0.7)';
 
 const styles = theme => ({
   fab: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
   secondaryBar: {
     zIndex: 0,
   },
   menuButton: {
-    marginLeft: -theme.spacing.unit,
+    marginLeft: -theme.spacing(1),
   },
   iconButtonAvatar: {
     padding: 4,
@@ -35,14 +35,14 @@ const styles = theme => ({
     },
   },
   button: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
     borderColor: lightColor,
   },
   leftIcon: {
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing(1),
   },
   rightIcon: {
-    marginLeft: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
   },
 });
 
@@ -53,7 +53,7 @@ function Header(props) {
     <React.Fragment>
       <AppBar color="primary" position="sticky" elevation={0}>
         <Toolbar>
-          <Grid container spacing={8} alignItems="center">
+          <Grid container spacing={1} alignItems="center">
             <Hidden smUp>
               <Grid item>
                 <IconButton
@@ -61,6 +61,7 @@ function Header(props) {
                   aria-label="Open drawer"
                   onClick={onDrawerToggle}
                   className={classes.menuButton}
+                  href=""
                 >
                   <MenuIcon/>
                 </IconButton>

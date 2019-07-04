@@ -5,3 +5,6 @@ node_modules
 *.sqlite3
 .data
 acme.json
+.env
+
+docker-compose.override.yml

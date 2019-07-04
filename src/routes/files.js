@@ -13,12 +13,15 @@ router.get('/:requestedFilename', async (ctx, next) => {
   const ipAddress = ctx.request.header['X-Forwarded-For'] || ctx.request.ip;
   const {requestedFilename} = ctx.params;
   const file = await getFileByFilename(requestedFilename);
-  if (!file)
-    return addDownload(0, ipAddress, false);
+  if (!file) {
+    return await addDownload(0, ipAddress, false);
+  }
   const {id} = file;
-  if ((!file.isPublic && !user) || await verifyOtp(otp))
-    return addDownload(id, ipAddress, false);
-  addDownload(id, ipAddress, true);
+
+  if ((!file.isPublic && !user) && !(await verifyOtp(otp))) {
+    return await addDownload(id, ipAddress, false);
+  }
+  await addDownload(id, ipAddress, true);
   await send(ctx, requestedFilename, { root: UPLOAD_PATH });
   await next();
 });

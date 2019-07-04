@@ -23,8 +23,8 @@ const styles = theme => ({
     margin: 'auto',
     overflow: 'hidden',
     textAlign: 'center',
-    paddingTop: theme.spacing.unit * 2,
-    paddingBottom: theme.spacing.unit * 2,
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
   },
   searchBar: {
     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
@@ -36,17 +36,17 @@ const styles = theme => ({
     display: 'block',
   },
   addUser: {
-    marginLeft: theme.spacing.unit,
+    marginLeft: theme.spacing(2),
   },
   contentWrapper: {
     margin: '40px 16px',
   },
   textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
+    marginLeft: theme.spacing(2),
+    marginRight: theme.spacing(2),
   },
   button: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
   heading: {
     ...theme.mixins.gutters(),
@@ -58,8 +58,8 @@ const styles = theme => ({
     margin: 'auto',
     overflow: 'hidden',
     textAlign: 'center',
-    paddingTop: theme.spacing.unit * 2,
-    paddingBottom: theme.spacing.unit * 2,
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
   }
 });
 
@@ -98,7 +98,7 @@ class LoginContent extends React.PureComponent {
     const {username, password, hasAttemptedLogin} = this.state;
 
     return (
-      <Grid container spacing={24} alignItems="center" justify="center" direction="column">
+      <Grid container spacing={3} alignItems="center" justify="center" direction="column">
         {
           hasAttemptedLogin ? (
             <Grow
@@ -125,7 +125,7 @@ class LoginContent extends React.PureComponent {
                 timeout={500}
               >
                 <Paper className={classes.paper}>
-                  <Grid container spacing={16}>
+                  <Grid container spacing={2}>
                     <Grid item key="title" xs={12}>
                       <Typography
                         variant="h5"

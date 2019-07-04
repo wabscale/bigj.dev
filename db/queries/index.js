@@ -1,7 +1,7 @@
 const db = require('../models');
 const bcrypt = require('bcryptjs');
 var crypto = require("crypto");
-const {DOMAIN} = require('../../config')
+const {DOMAIN, OTP_TIMEOUT} = require('../../config');
 
 module.exports = {
   // get
@@ -34,7 +34,7 @@ module.exports = {
   ),
   getOTP: async (fileID) => {
     const otp = crypto.randomBytes(8).toString('hex');
-    const file = await db.File.findAll({where:{id:fileID}});
+    const file = await db.File.findAll({where: {id: fileID}});
     await db.OTP.create({otp, fileID});
     return {
       otp: `${DOMAIN}/f/${file[0].filename}?otp=${otp}`,
@@ -64,4 +64,19 @@ module.exports = {
     await db.File.update({...file}, {where: {id: file.fileID}});
     return file;
   },
+
+  // verify
+  verifyOtp: async userOTP => {
+    if (!userOTP) return false;
+    const otps = await db.OTP.findAll({where: {otp: userOTP,}});
+    const otp = otps.length === 1 ? otps[0] : null;
+    if (!otp) return false;
+    if (!otp.downloadTime) {
+      otp.downloadTime = new Date().getTime();
+      otp.save();
+    }
+    console.log(otp.downloadTime + OTP_TIMEOUT);
+    console.log(new Date().getTime());
+    return otp.downloadTime + OTP_TIMEOUT > new Date().getTime();
+  }
 };

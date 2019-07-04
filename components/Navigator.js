@@ -34,7 +34,7 @@ const categories = [
 
 const styles = theme => ({
   root: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
   categoryHeader: {
     paddingTop: 16,
@@ -44,7 +44,7 @@ const styles = theme => ({
     color: theme.palette.common.white,
   },
   menuButton: {
-    marginLeft: -theme.spacing.unit,
+    marginLeft: theme.spacing(-1),
   },
   item: {
     paddingTop: 4,
@@ -73,13 +73,9 @@ const styles = theme => ({
   itemPrimary: {
     color: 'inherit',
     fontSize: theme.typography.fontSize,
-    '&$textDense': {
-      fontSize: theme.typography.fontSize,
-    },
   },
-  textDense: {},
   divider: {
-    marginTop: theme.spacing.unit * 2,
+    marginTop: theme.spacing(2),
   },
 });
 
@@ -143,7 +139,6 @@ function Navigator(props) {
                 <ListItemText
                   classes={{
                     primary: classes.itemPrimary,
-                    textDense: classes.textDense,
                   }}
                 >
                   {childId}
