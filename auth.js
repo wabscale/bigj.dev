@@ -23,7 +23,7 @@ loadKey = async () => {
 };
 
 generateToken = async (username, password) => {
-  await addUser('admin','password');
+  // await addUser('admin','password');
   // const user = await getUserByUsername(username);
   if (user === null || !comparePass(password, user.password))
     throw new AuthenticationError('Unauthorized');
