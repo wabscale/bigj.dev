@@ -24,7 +24,7 @@ loadKey = async () => {
 
 generateToken = async (username, password) => {
   // await addUser('admin','password');
-  // const user = await getUserByUsername(username);
+  const user = await getUserByUsername(username);
   if (user === null || !comparePass(password, user.password))
     throw new AuthenticationError('Unauthorized');
   return jwt.sign({id: user.id}, await loadKey(), {expiresIn: '7d'});
