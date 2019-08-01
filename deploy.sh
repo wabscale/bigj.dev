@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd `dirname $0`
+
 set -e
 
 export UPLOAD_PATH=/home/jc/uploads
