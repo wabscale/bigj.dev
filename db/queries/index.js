@@ -70,13 +70,18 @@ module.exports = {
     if (!userOTP) return false;
     const otps = await db.OTP.findAll({where: {otp: userOTP,}});
     const otp = otps.length === 1 ? otps[0] : null;
-    if (!otp) return false;
-    if (!otp.downloadTime) {
-      otp.downloadTime = new Date().getTime();
-      otp.save();
-    }
-    console.log(otp.downloadTime + OTP_TIMEOUT);
-    console.log(new Date().getTime());
-    return otp.downloadTime + OTP_TIMEOUT > new Date().getTime();
+
+    return !!otp;
+
+    // enforce time
+
+    /* if (!otp) return false;
+     * if (!otp.downloadTime) {
+     *   otp.downloadTime = new Date().getTime();
+     *   otp.save();
+     * }
+     * console.log(otp.downloadTime + OTP_TIMEOUT);
+     * console.log(new Date().getTime());
+     * return otp.downloadTime + OTP_TIMEOUT > new Date().getTime(); */
   }
 };
