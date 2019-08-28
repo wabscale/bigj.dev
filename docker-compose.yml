@@ -29,16 +29,8 @@ services:
     networks:
       - traefik-proxy
 
-  base:
-    build: .
-    image: info.base
-    environment:
-      - "NODE_ENV=production"
-      - "API_HOST=api.bigj.dev"
-
   api:
-    image: info.base
-    entrypoint: "node api/index.js"
+    build: api
     environment:
       - "PORT=5000"
       - "NODE_ENV=production"
@@ -47,13 +39,12 @@ services:
       - "traefik.port=5000"
       - "traefik.frontend.rule=Host:api.bigj.dev"
     volumes:
-      - "$UPLOAD_PATH:/opt/app/.data/files"
+      - "$UPLOAD_PATH:/data"
     networks:
       - traefik-proxy
 
-  static:
-    image: info.base
-    entrypoint: "node src/index.js"
+  frontend:
+    build: frontend
     environment:
       - "PORT=5000"
       - "NODE_ENV=production"
@@ -61,8 +52,6 @@ services:
       - "traefik.enable=true"
       - "traefik.port=5000"
       - "traefik.frontend.rule=Host:f.bigj.dev"
-    volumes:
-      - "$UPLOAD_PATH:/opt/app/.data/files"
     networks:
       - traefik-proxy
 

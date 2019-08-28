@@ -1,0 +1,12 @@
+.data
+.git
+.gitignore
+.idea
+node_modules
+src/static/js/*.*.js
+deploy.sh
+docker-compose.yml
+Dockerfile
+.gitlab-ci.yml
+traefik.toml
+acme.json
