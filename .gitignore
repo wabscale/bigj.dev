@@ -8,3 +8,4 @@ acme.json
 .env
 
 docker-compose.override.yml
+yarn-error.log

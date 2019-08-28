@@ -2,23 +2,26 @@
 
 set -xe
 
-if [ ! -d ./.data/files ]; then
-    mkdir -p ./.data/files;
-fi
+export UPLOAD_PATH=${HOME}/downloads
 
 if ! docker network ls | awk '{print $2}' | grep 'traefik-proxy' &> /dev/null; then
     docker network create traefik-proxy;
 fi
 
-docker-compose up \
-               -d \
-               --build \
-               --force-recreate \
-               --remove-orphans \
-               traefik \
-               db
+persistent_services=(
+    traefik
+    db
+)
+
+for service in ${persistent_services[@]}; do
+    if docker-compose ps | grep "${service}" | awk '{exit($3 == "Up")}'; then
+        docker-compose up -d --build --force-recreate --remove-orphans "${service}"
+    fi
+done
+
+docker-compose up -d --force-recreate --remove-orphans api frontend
 
 set +x
 
+echo
 echo 'Make sure you uncomment /etc/hosts'
-echo 'Ready to start api and frontend'

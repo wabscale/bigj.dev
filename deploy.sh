@@ -31,7 +31,7 @@ fi
 docker-compose build # --no-cache
 docker-compose kill
 docker-compose rm -f
-docker-compose up -d --force-recreate db api static traefik
+docker-compose up -d --force-recreate db api frontend traefik
 
 echo "waiting for db to start..."
 while ! mysqladmin ping -h "127.0.0.1" -P 3306 --silent; do
