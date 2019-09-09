@@ -32,8 +32,9 @@ generateToken = async (username, password) => {
 
 loadUser = async (ctx, next) => {
   const {cookies} = new Cookies(ctx.request.headers.cookie);
+  
   try {
-    const loadedToken = ctx.req.headers.token || cookies.token;
+    const loadedToken = ctx.req.headers.token || cookies.token || ctx.params.token;
     const token = jwt.verify(loadedToken, await loadKey());
     ctx.state.user = await getUserById(token.id);
   } catch(err) {}

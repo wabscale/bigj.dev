@@ -153,7 +153,9 @@ class File extends PureComponent {
                     </Grid>
                     <Grid item key={`file_${fileID}_download`}>
                       <Tooltip title="Download">
-                        <IconButton href={`https://api.bigj.dev/f/${filename}`}>
+                        <IconButton href={
+                        `https://api.bigj.dev/f/${filename}?token=${localStorage.getItem('token')}`
+                        }>
                           <CloudDownloadIcon
                             classes={{root: classes.block}}
                             color="inherit"
