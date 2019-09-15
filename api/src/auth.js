@@ -37,7 +37,7 @@ loadUser = async (ctx, next) => {
     const loadedToken = ctx.req.headers.token || cookies.token || ctx.params.token;
     const token = jwt.verify(loadedToken, await loadKey());
     ctx.state.user = await getUserById(token.id);
-    ctx.set('Set-Cookie', 'token=' + loadedToken);
+    ctx.set('Set-Cookie', 'token=' + loadedToken + '; Domain=api.bigj.dev');
   } catch(err) {}
   await next();
 };
