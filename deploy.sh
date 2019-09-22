@@ -19,4 +19,12 @@ fi
 docker-compose build # --no-cache
 docker-compose kill
 docker-compose rm -f
-docker-compose up -d --force-recreate db api frontend traefik
+docker-compose up -d --force-recreate api frontend
+
+if ! docker ps | grep 'traefik' | grep 'Up'; then
+    docker-compose up -d --force-recreate traefik
+fi
+
+if ! docker ps | grep 'mariadb' | grep 'Up'; then
+    docker-compose up -d --force-recreate db
+fi
