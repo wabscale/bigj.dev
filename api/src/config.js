@@ -5,7 +5,7 @@ const {NODE_ENV} = process.env;
 
 const config = {
   UPLOAD_PATH: '/data',
-  DOMAIN: 'https://api.bigj.dev',
+  DOMAIN: 'https://f.bigj.dev',
   OTP_TIMEOUT: 500 * 1000
 };
 

@@ -16,9 +16,9 @@ InsecureSkipVerify = true
   compress = true
     [entryPoints.https.tls]
 
-# [api]
-# entryPoint = "https"
-# dashboard = true
+[api]
+#entryPoint = "https"
+dashboard = true
 
 #  [api.statistics]
 

@@ -25,6 +25,10 @@ if ! docker ps | grep 'traefik' | grep 'Up'; then
     docker-compose up -d --force-recreate traefik
 fi
 
+if ! docker ps | grep 'redirect' | grep 'Up'; then
+    docker-compose up -d --force-recreate redirect
+fi
+
 if ! docker ps | grep 'mariadb' | grep 'Up'; then
     docker-compose up -d --force-recreate db
 fi
