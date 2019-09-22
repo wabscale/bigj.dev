@@ -16,6 +16,17 @@ services:
     networks:
       - traefik-proxy
 
+  redirect:
+    image: jmc1283/redirect
+    environment:
+      - "DEST=http://f.bigj.dev/"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=80"
+      - "traefik.frontend.rule=Host:api.bigj.dev"
+    networks:
+      - traefik-proxy
+
   db:
     image: mariadb:10.4
     dns: [ 8.8.8.8 ]
@@ -40,7 +51,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.port=5000"
-      - "traefik.frontend.rule=Host:api.bigj.dev"
+      - "traefik.frontend.rule=Host:f.bigj.dev;PathPrefix:/graphql,/f/"
     volumes:
       - "$UPLOAD_PATH:/data"
     networks:

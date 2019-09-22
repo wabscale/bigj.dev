@@ -32,12 +32,12 @@ generateToken = async (username, password) => {
 
 loadUser = async (ctx, next) => {
   const {cookies} = new Cookies(ctx.request.headers.cookie);
-  
+
   try {
     const loadedToken = ctx.req.headers.token || cookies.token || ctx.params.token;
     const token = jwt.verify(loadedToken, await loadKey());
     ctx.state.user = await getUserById(token.id);
-    ctx.set('Set-Cookie', 'token=' + loadedToken + '; Domain=api.bigj.dev');
+    ctx.set('Set-Cookie', 'token=' + loadedToken + '; Domain=f.bigj.dev');
   } catch(err) {}
   await next();
 };

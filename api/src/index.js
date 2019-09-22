@@ -49,12 +49,12 @@ router.get('/', async ctx => {
   };
 });
 
-if (process.env.NODE_ENV === 'development') {
-  const koaPlayground = require('graphql-playground-middleware-koa').default;
-  // console.log(koaPlayground)
-  router.all('/playground', koaPlayground({endpoint: '/graphql'}));
-  console.log(`playground: http://api.localhost:${PORT}/playground`);
-}
+/* if (process.env.NODE_ENV === 'development') {
+ *   const koaPlayground = require('graphql-playground-middleware-koa').default;
+ *   // console.log(koaPlayground)
+ *   router.all('/playground', koaPlayground({endpoint: '/graphql'}));
+ *   console.log(`playground: http://api.localhost:${PORT}/playground`);
+ * } */
 
 app.use(router.routes());
 app.use(router.allowedMethods());

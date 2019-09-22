@@ -9,6 +9,7 @@ if ! docker network ls | awk '{print $2}' | grep 'traefik-proxy' &> /dev/null; t
 fi
 
 persistent_services=(
+    redirect
     traefik
     db
 )
