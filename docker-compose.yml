@@ -2,19 +2,26 @@ version: '2'
 
 services:
   traefik:
-    image: traefik:1.7.14
-    dns: [ 8.8.8.8 ]
+    image: "traefik:v2.0.0-rc3"
+    container_name: "traefik"
+    command:
+      - "--providers.docker=true"
+      - "--api.insecure=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.http.address=:80"
+      - "--entrypoints.https.address=:443"
+      - "--certificatesresolvers.tls.acme.httpchallenge=true"
+      - "--certificatesresolvers.tls.acme.httpchallenge.entrypoint=http"
+      #- "--certificatesresolvers.myhttpchallenge.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.tls.acme.email=johncunniff1248@gmail.com"
+      - "--certificatesresolvers.tls.acme.storage=/letsencrypt/acme.json"
     ports:
-      - "443:443"
       - "80:80"
+      - "443:443"
+      - "127.0.0.1:8080:8080"
     volumes:
-      - "/etc/traefik/acme/acme.json:/etc/traefik/acme/acme.json"
-      - "./traefik.toml:/etc/traefik/traefik.toml"
-      - "/var/run/docker.sock:/var/run/docker.sock"
-    labels:
-      - "traefik.enable=false"
-    networks:
-      - traefik-proxy
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./acme.json:/letsencrypt/acme.json"
 
   redirect:
     image: jmc1283/redirect
@@ -22,8 +29,11 @@ services:
       - "DEST=http://f.bigj.dev/"
     labels:
       - "traefik.enable=true"
-      - "traefik.port=80"
-      - "traefik.frontend.rule=Host:api.bigj.dev"
+      - "traefik.http.routers.redirect.rule=Host(`api.bigj.dev`)"
+      - "traefik.http.routers.redirect.entrypoints=https"
+      - "traefik.http.routers.redirect.tls.certresolver=tls"
+      - "traefik.http.services.redirect.loadbalancer.server.port=4000"
+      - "traefik.http.middlewares.redirect.redirectscheme.scheme=https"
     networks:
       - traefik-proxy
 
@@ -50,8 +60,11 @@ services:
       - "NODE_ENV=production"
     labels:
       - "traefik.enable=true"
-      - "traefik.port=5000"
-      - "traefik.frontend.rule=Host:f.bigj.dev;PathPrefix:/graphql,/f/"
+      - "traefik.http.routers.api.rule=Host(`f.bigj.dev`) && PathPrefix(`/graphql,/f/`)"
+      - "traefik.http.routers.api.entrypoints=https"
+      - "traefik.http.routers.api.tls.certresolver=tls"
+      - "traefik.http.services.api.loadbalancer.server.port=5000"
+      - "traefik.http.middlewares.api.redirectscheme.scheme=https"
     volumes:
       - "$UPLOAD_PATH:/data"
     networks:
@@ -65,8 +78,11 @@ services:
       - "NODE_ENV=production"
     labels:
       - "traefik.enable=true"
-      - "traefik.port=5000"
-      - "traefik.frontend.rule=Host:f.bigj.dev"
+      - "traefik.http.routers.frontend.rule=Host(`f.bigj.dev`)"
+      - "traefik.http.routers.frontend.entrypoints=https"
+      - "traefik.http.routers.frontend.tls.certresolver=tls"
+      - "traefik.http.services.frontend.loadbalancer.server.port=5000"
+      - "traefik.http.middlewares.frontend.redirectscheme.scheme=https"
     networks:
       - traefik-proxy
 
