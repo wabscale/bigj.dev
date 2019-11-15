@@ -31,11 +31,16 @@ services:
       - "DEST=http://f.bigj.dev/"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.devredirect.rule=Host(`api.bigj.dev`)"
-      - "traefik.http.routers.devredirect.entrypoints=https"
-      - "traefik.http.routers.devredirect.tls.certresolver=tls"
-      - "traefik.http.services.devredirect.loadbalancer.server.port=4000"
-      - "traefik.http.middlewares.devredirect.redirectscheme.scheme=https"
+
+      - "traefik.http.routers.dev-redirect-http.rule=Host(`api.bigj.dev`)"
+      - "traefik.http.routers.dev-redirect-http.entrypoints=http"
+      - "traefik.http.routers.dev-redirect-http.middlewares=redirect"
+
+      - "traefik.http.routers.dev-redirect.rule=Host(`api.bigj.dev`)"
+      - "traefik.http.routers.dev-redirect.entrypoints=https"
+      - "traefik.http.routers.dev-redirect.tls.certresolver=tls"
+      - "traefik.http.services.dev-redirect.loadbalancer.server.port=4000"
+      - "traefik.http.middlewares.dev-redirect.redirectscheme.scheme=https"
     networks:
       - traefik-proxy
 
@@ -62,11 +67,16 @@ services:
       - "NODE_ENV=production"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.devapi.rule=Host(`f.bigj.dev`) && PathPrefix(`/graphql,/f/`)"
-      - "traefik.http.routers.devapi.entrypoints=https"
-      - "traefik.http.routers.devapi.tls.certresolver=tls"
-      - "traefik.http.services.devapi.loadbalancer.server.port=5000"
-      - "traefik.http.middlewares.devapi.redirectscheme.scheme=https"
+
+      - "traefik.http.routers.dev-api-http.rule=Host(`f.bigj.dev`) && PathPrefix(`/graphql,/f/`)"
+      - "traefik.http.routers.dev-api-http.entrypoints=http"
+      - "traefik.http.routers.dev-api-http.middlewares=redirect"
+
+      - "traefik.http.routers.dev-api.rule=Host(`f.bigj.dev`) && PathPrefix(`/graphql,/f/`)"
+      - "traefik.http.routers.dev-api.entrypoints=https"
+      - "traefik.http.routers.dev-api.tls.certresolver=tls"
+      - "traefik.http.services.dev-api.loadbalancer.server.port=5000"
+      - "traefik.http.middlewares.dev-api.redirectscheme.scheme=https"
     volumes:
       - "$UPLOAD_PATH:/data"
     networks:
@@ -80,11 +90,16 @@ services:
       - "NODE_ENV=production"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.devfrontend.rule=Host(`f.bigj.dev`)"
-      - "traefik.http.routers.devfrontend.entrypoints=https"
-      - "traefik.http.routers.devfrontend.tls.certresolver=tls"
-      - "traefik.http.services.devfrontend.loadbalancer.server.port=5000"
-      - "traefik.http.middlewares.devfrontend.redirectscheme.scheme=https"
+
+      - "traefik.http.routers.dev-frontend-http.rule=Host(`f.bigj.dev`)"
+      - "traefik.http.routers.dev-frontend-http.entrypoints=http"
+      - "traefik.http.routers.dev-frontend-http.middlewares=redirect"
+
+      - "traefik.http.routers.dev-frontend.rule=Host(`f.bigj.dev`)"
+      - "traefik.http.routers.dev-frontend.entrypoints=https"
+      - "traefik.http.routers.dev-frontend.tls.certresolver=tls"
+      - "traefik.http.services.dev-frontend.loadbalancer.server.port=5000"
+      - "traefik.http.middlewares.dev-frontend.redirectscheme.scheme=https"
     networks:
       - traefik-proxy
 
