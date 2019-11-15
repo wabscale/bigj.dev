@@ -6,7 +6,7 @@ services:
     container_name: "traefik"
     command:
       - "--providers.docker=true"
-      # - "--api.insecure=true"
+      - "--api.insecure=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.http.address=:80"
       - "--entrypoints.https.address=:443"
@@ -18,7 +18,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      # - "127.0.0.1:8080:8080"
+      - "127.0.0.1:8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./acme.json:/letsencrypt/acme.json"
@@ -68,11 +68,11 @@ services:
     labels:
       - "traefik.enable=true"
 
-      - "traefik.http.routers.dev-api-http.rule=Host(`f.bigj.dev`) && PathPrefix(`/graphql,/f/`)"
+      - "traefik.http.routers.dev-api-http.rule=Host(`f.bigj.dev`) && PathPrefix(`/graphql`,`/f/`)"
       - "traefik.http.routers.dev-api-http.entrypoints=http"
       - "traefik.http.routers.dev-api-http.middlewares=redirect"
 
-      - "traefik.http.routers.dev-api.rule=Host(`f.bigj.dev`) && PathPrefix(`/graphql,/f/`)"
+      - "traefik.http.routers.dev-api.rule=Host(`f.bigj.dev`) && PathPrefix(`/graphql`,`/f/`)"
       - "traefik.http.routers.dev-api.entrypoints=https"
       - "traefik.http.routers.dev-api.tls.certresolver=tls"
       - "traefik.http.services.dev-api.loadbalancer.server.port=5000"

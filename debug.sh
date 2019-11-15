@@ -2,6 +2,12 @@
 
 set -xe
 
+if [ ! -f ./acme.json ]; then
+    sudo mkdir -p /etc/traefik/acme/
+    sudo touch /etc/traefik/acme/acme.json
+    sudo chmod 600 /etc/traefik/acme/acme.json
+fi
+
 export UPLOAD_PATH=${HOME}/downloads
 
 if ! docker network ls | awk '{print $2}' | grep 'traefik-proxy' &> /dev/null; then
