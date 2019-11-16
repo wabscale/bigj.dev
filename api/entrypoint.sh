@@ -12,4 +12,4 @@ npx sequelize db:migrate
 cd ../../
 
 yarn migrate
-yarn debug
+yarn start
