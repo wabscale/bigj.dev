@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM node:12-alpine
 
 WORKDIR /opt/app
 RUN apk add --update --no-cache mysql-client
