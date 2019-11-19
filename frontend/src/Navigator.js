@@ -15,12 +15,16 @@ import {faSignOutAlt} from "@fortawesome/free-solid-svg-icons/faSignOutAlt";
 import {faSignInAlt} from "@fortawesome/free-solid-svg-icons/faSignInAlt";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+
+
 
 const categories = [
   {
     id: 'Files',
     children: [
       {id: 'View', icon: <FolderIcon/>},
+      {id: 'Upload', icon: <CloudUploadIcon/>}
     ],
   },
   {

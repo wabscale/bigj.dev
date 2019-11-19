@@ -9,6 +9,7 @@ import Navigator from './Navigator';
 import FileContent from './File/FileContent';
 import LoginContent from './Login/LoginContent';
 import Header from './Header';
+import Upload from "./Upload/Upload";
 
 let theme = createMuiTheme({
   typography: {
@@ -237,16 +238,21 @@ class Paperbase extends React.Component {
             <Header onDrawerToggle={this.handleDrawerToggle}/>
             <main className={classes.mainContent}>
               {
-                active === "View" ? <FileContent
+                {
+                  'View': () => <FileContent
                     switchView={this.switchView}
                     style={{height: "100%", width: "100%"}}
                     displayCount={9}
-                  /> :
-                  active === "Sign In" ? <LoginContent
-                      switchView={this.switchView}
-                      style={{height: "100%", width: "100%"}}
-                    /> :
-                    <Fragment/>
+                  />,
+                  'Sign In': () => <LoginContent
+                    switchView={this.switchView}
+                    style={{height: "100%", width: "100%"}}
+                  />,
+                  'Upload': () => <Upload
+                    switchView={this.switchView}
+                    style={{height: "100%", width: "100%"}}
+                  />
+                }[active]()
               }
             </main>
           </div>

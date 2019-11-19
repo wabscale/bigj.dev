@@ -78,6 +78,7 @@ export const DELETE_FILE = gql`
 export const UPLOAD_FILE = gql`
   mutation UploadFile($file: Upload!) {
     singleUpload(file: $file) {
+      fileID
       filename
     }
   }

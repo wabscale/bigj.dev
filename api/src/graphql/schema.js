@@ -31,6 +31,7 @@ const typeDefs = gql`
   }
 
   type UploadFile {
+    fileID: String!
     filename: String!
     mimetype: String!
     encoding: String!

@@ -77,10 +77,10 @@ const storeFS = ({stream, filename}) => {
 
 handleUpload = async (file) => {
   const {createReadStream, filename, mimetype, encoding} = await file;
-  const stream = createReadStream();
+  const stream = await createReadStream();
   await storeFS({stream, filename});
-  await addFile({filename});
-  return {filename, mimetype, encoding};
+  const fileID = (await addFile({filename})).id;
+  return {fileID, filename, mimetype, encoding};
 };
 
 transformDownloadHistory = async (records) => (

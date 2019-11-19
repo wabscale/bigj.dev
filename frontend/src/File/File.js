@@ -26,6 +26,7 @@ import {
   UPDATE_FILE,
   DELETE_FILE
 } from "../queries";
+import {humanSize} from "../utils";
 
 const styles = theme => ({
   paper: {
@@ -82,26 +83,6 @@ class File extends PureComponent {
       isPublic: !this.state.isPublic,
     }, this.update);
   }
-
-  truncateDecimals = (number, digits) => {
-    let multiplier = Math.pow(10, digits),
-      adjustedNum = number * multiplier,
-      truncatedNum = Math[adjustedNum < 0 ? 'ceil' : 'floor'](adjustedNum);
-
-    return truncatedNum / multiplier;
-  };
-
-  humanSize = (nbytes) => {
-    let suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-    let i = 0;
-    let f = `${nbytes}`;
-    while (nbytes >= 1024 && i < suffixes.length - 1) {
-      nbytes /= 1024;
-      ++i;
-      f = this.truncateDecimals(nbytes, 2);
-    }
-    return `${nbytes} ${suffixes[i]}`;
-  };
 
   render() {
     const {classes, index} = this.props;
@@ -243,7 +224,7 @@ class File extends PureComponent {
                   args={{fileID}}
                   reshape={data => [
                     <Typography>
-                      {this.humanSize(data.file.size)}
+                      {humanSize(data.file.size)}
                     </Typography>
                   ]}
                 />
