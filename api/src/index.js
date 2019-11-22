@@ -14,7 +14,7 @@ const {loadUser} = require('./auth');
 const files = require('./graphql/files');
 const fileRouter = require('./static/files.js');
 
-const PORT = process.env.PORT || '8080';
+const PORT = process.env.PORT || '5000';
 const app = new Koa();
 
 app.keys = [
@@ -59,6 +59,12 @@ router.get('/', async ctx => {
 app.use(router.routes());
 app.use(router.allowedMethods());
 app.use(fileRouter.routes());
+
+
+if (!!process.env.API_ROOT_PASSWORD) {
+  const db = require('./db');
+  db.addUser('root', process.env.API_ROOT_PASSWORD);
+}
 
 console.log("Listening!");
 app.listen(PORT, '0.0.0.0');

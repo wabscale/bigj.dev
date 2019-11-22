@@ -1,14 +1,14 @@
 #!/bin/sh
 
+# Backs up mysql database
+# depends on MYSQL_ROOT_PASSWORD being set correctly
+# Usage:
+#   ./backup.sh
+#
+# This script will create a file that looks like dump-1574324013.sql.gz
 
 # Crontab
 # @weekly /home/jc/projects/dev/backup.sh /home/jc/backups/dev
 
-if [ $# -ne 1 ]; then
-    echo 'output dir needed'
-    exit 1
-fi
 
-mkdir -p $1
-
-mysqldump -h 127.0.0.1 -u root --password=password dev > ${1}/dump-`date +%s`.sql
+docker-compose exec db mysqldump -u root --password=${MYSQL_ROOT_PASSWORD} dev # | gzip - > dump-`date +%s`.sql.gz
