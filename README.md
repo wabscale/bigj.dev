@@ -29,7 +29,7 @@ Each of these variables are required for deployment. The deploy.sh script will b
 ```
 ACME_EMAIL=john.doe@email.com   # email for lets encrypt cert (any valid email will work)
 
-API_ROOT_PASSWORD=password      # default root password for api (set at api startup)
+MYSQL_ROOT_PASSWORD=password    # password for mysql database
 API_DOMAIN=f.bigj.dev           # domain that app will be deployed on
 
 UPLOAD_PATH=~/uploads           # place where files will be hosted
@@ -39,7 +39,7 @@ CONFIG_PATH=/var/lib/f.bigj.dev # a place to put the persistent data for traefik
 ### Optional environment config
 These variables are not required. You will get a warning if you deploy without these, you will get a warning.
 ```
-MYSQL_ROOT_PASSWORD=password    # password for mysql database
+API_ROOT_PASSWORD=password      # default root password for api (set at api startup)
 ```
 
 #### CD/CI
