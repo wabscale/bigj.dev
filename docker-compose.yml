@@ -12,35 +12,19 @@ services:
       - "--entrypoints.https.address=:443"
       - "--certificatesresolvers.tls.acme.httpchallenge=true"
       - "--certificatesresolvers.tls.acme.httpchallenge.entrypoint=http"
-      #- "--certificatesresolvers.myhttpchallenge.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-      - "--certificatesresolvers.tls.acme.email=johncunniff1248@gmail.com"
+      - "--certificatesresolvers.tls.acme.email=${ACME_EMAIL}"
       - "--certificatesresolvers.tls.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
       - "443:443"
-      - "127.0.0.1:8080:8080"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./acme.json:/letsencrypt/acme.json"
-    networks:
-      - traefik-proxy
-
-  redirect:
-    image: jmc1283/redirect
-    environment:
-      - "DEST=http://f.bigj.dev/"
     labels:
       - "traefik.enable=true"
 
-      - "traefik.http.routers.dev-redirect-http.rule=Host(`api.bigj.dev`)"
-      - "traefik.http.routers.dev-redirect-http.entrypoints=http"
-      - "traefik.http.routers.dev-redirect-http.middlewares=redirect"
-
-      - "traefik.http.routers.dev-redirect.rule=Host(`api.bigj.dev`)"
-      - "traefik.http.routers.dev-redirect.entrypoints=https"
-      - "traefik.http.routers.dev-redirect.tls.certresolver=tls"
-      - "traefik.http.services.dev-redirect.loadbalancer.server.port=4000"
-      - "traefik.http.middlewares.dev-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect.redirectregex.regex=^http://(.*)"
+      - "traefik.http.middlewares.redirect.redirectregex.replacement=https://$$1"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "${CONFIG_PATH}/acme.json:/letsencrypt/acme.json"
     networks:
       - traefik-proxy
 
@@ -50,10 +34,10 @@ services:
     ports:
       - "127.0.0.1:3306:3306"
     environment:
-      - "MYSQL_ROOT_PASSWORD=password"
+      - "MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}"
       - "MYSQL_DATABASE=dev"
     volumes:
-      - "./.data/mysql:/var/lib/mysql"
+      - "${CONFIG_PATH}/mysql:/var/lib/mysql"
     labels:
       - "traefik.enable=false"
     networks:
@@ -65,14 +49,16 @@ services:
     environment:
       - "PORT=5000"
       - "NODE_ENV=production"
+
+      - "API_ROOT_PASSWORD=${API_ROOT_PASSWORD}"
     labels:
       - "traefik.enable=true"
 
-      - "traefik.http.routers.dev-api-http.rule=Host(`f.bigj.dev`) && PathPrefix(`/graphql`,`/f/`)"
+      - "traefik.http.routers.dev-api-http.rule=Host(`${API_DOMAIN}`) && PathPrefix(`/graphql`,`/f/`)"
       - "traefik.http.routers.dev-api-http.entrypoints=http"
       - "traefik.http.routers.dev-api-http.middlewares=redirect"
 
-      - "traefik.http.routers.dev-api.rule=Host(`f.bigj.dev`) && PathPrefix(`/graphql`,`/f/`)"
+      - "traefik.http.routers.dev-api.rule=Host(`${API_DOMAIN}`) && PathPrefix(`/graphql`,`/f/`)"
       - "traefik.http.routers.dev-api.entrypoints=https"
       - "traefik.http.routers.dev-api.tls.certresolver=tls"
       - "traefik.http.services.dev-api.loadbalancer.server.port=5000"
@@ -91,11 +77,11 @@ services:
     labels:
       - "traefik.enable=true"
 
-      - "traefik.http.routers.dev-frontend-http.rule=Host(`f.bigj.dev`)"
+      - "traefik.http.routers.dev-frontend-http.rule=Host(`${API_DOMAIN}`)"
       - "traefik.http.routers.dev-frontend-http.entrypoints=http"
       - "traefik.http.routers.dev-frontend-http.middlewares=redirect"
 
-      - "traefik.http.routers.dev-frontend.rule=Host(`f.bigj.dev`)"
+      - "traefik.http.routers.dev-frontend.rule=Host(`${API_DOMAIN}`)"
       - "traefik.http.routers.dev-frontend.entrypoints=https"
       - "traefik.http.routers.dev-frontend.tls.certresolver=tls"
       - "traefik.http.services.dev-frontend.loadbalancer.server.port=5000"

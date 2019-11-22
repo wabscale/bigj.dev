@@ -1,10 +1,10 @@
 stages:
   - deploy
 
-build_jnet:
+deploy_site:
   stage: deploy
   tags:
-    - server-tag
+    - jcs
   script:
     - ./deploy.sh
   only:

@@ -9,10 +9,8 @@ import IconButton from '@material-ui/core/IconButton';
 import {withStyles} from '@material-ui/core/styles';
 import DeleteIcon from '@material-ui/icons/Delete';
 import SaveIcon from '@material-ui/icons/Save';
-import FileExpand from './FileExpand';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
-import DoneIcon from '@material-ui/icons/Done';
-import ErrorIcon from '@material-ui/icons/Error';
+
 import Switch from '@material-ui/core/Switch';
 import Link from '@material-ui/core/Link';
 import PropTypes from "prop-types";
@@ -27,6 +25,8 @@ import {
   DELETE_FILE
 } from "../queries";
 import {humanSize} from "../utils";
+import FileExpand from './FileExpand';
+import HistoryExpand from "./HistoryExpand";
 
 const styles = theme => ({
   paper: {
@@ -175,7 +175,7 @@ class File extends PureComponent {
                 </Toolbar>
               </AppBar>
               <div className={classes.root}>
-                <FileExpand
+                <HistoryExpand
                   heading="History"
                   query={GET_DOWNLOAD_HISTORY}
                   args={{fileID}}
@@ -183,29 +183,11 @@ class File extends PureComponent {
                     const datetime = new Date(0);
                     datetime.setUTCMilliseconds(time);
                     const trimmedIPAddress = ipAddress.substr(ipAddress.lastIndexOf(':') + 1);
-                    return (
-                      <Grid container spacing={1} key={`historyItem-${time}`}>
-                        <Grid item xs={3} key={"ip"}>
-                          <Typography>
-                            {trimmedIPAddress}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={7} key={"date"}>
-                          <Typography>
-                            {datetime.toLocaleString()}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={2} key={"icon"}>
-                          <Tooltip title={`Download was ${allowed ? "" : "not"} allowed`}>
-                            <IconButton color={"secondary"}>
-                            {allowed
-                              ? <DoneIcon color="primary" className={classes.icon}/>
-                              : <ErrorIcon color="error" className={classes.icon}/>}
-                            </IconButton>
-                          </Tooltip>
-                        </Grid>
-                      </Grid>
-                    );
+                    return {
+                      ip: trimmedIPAddress,
+                      time: datetime.toLocaleString(),
+                      allowed,
+                    }
                   })}
                 />
                 <FileExpand
