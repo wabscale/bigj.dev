@@ -42,7 +42,7 @@ up_persistent_services() {
     )
 
     for service in ${persistent_services[@]}; do
-        if docker-compose ps | grep "${service}" | awk '{exit($3 == "Up")}'; then
+        if docker ps | grep "${service}"; then
             docker-compose up -d --build --force-recreate --remove-orphans "${service}"
         fi
     done
@@ -63,7 +63,7 @@ check_env() {
     )
 
     for var_name in ${required_env_vars[@]}; do
-        if env | grep "^${var_name}="; then
+        if ! env | grep "^${var_name}=" &> /dev/null; then
             # if var not defined
             >&2 echo "ERROR ${var_name} is not defined! This variable is required."
             exit 1
@@ -75,7 +75,7 @@ check_env() {
     )
 
     for var_name in ${required_env_vars[@]}; do
-        if env | grep "^${var_name}="; then
+        if ! env | grep "^${var_name}=" &> /dev/null; then
             # if var not defined
             >&2 echo "ERROR ${var_name} is not defined! This variable is optional."
         fi

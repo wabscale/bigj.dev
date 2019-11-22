@@ -33,26 +33,28 @@ check_env() {
     # Checks to make sure necessary env vars are set
 
     required_env_vars=(
-        # acme email address
-        ACME_EMAIL
-
-        # domain to be deployed on and default webui password
-        API_DOMAIN
-        API_ROOT_PASSWORD
-
-        # mysql root password
-        MYSQL_ROOT_PASSWORD
-
-        # upload directory and persistent config location
-        UPLOAD_PATH
-        CONFIG_PATH
+        ACME_EMAIL            # email for lets encrypt cert
+        API_DOMAIN            # domain app is hosted on
+        UPLOAD_PATH           # location for hosted resources
+        MYSQL_ROOT_PASSWORD   # mysql database password
     )
 
     for var_name in ${required_env_vars[@]}; do
-        if env | grep "^${var_name}="; then
+        if ! env | grep "^${var_name}=" &> /dev/null; then
             # if var not defined
             >&2 echo "ERROR ${var_name} is not defined! This variable is required."
             exit 1
+        fi
+    done
+
+    optional_env_vars=(
+        API_ROOT_PASSWORD     # password to be set for root user of webui
+    )
+
+    for var_name in ${required_env_vars[@]}; do
+        if ! env | grep "^${var_name}=" &> /dev/null; then
+            # if var not defined
+            >&2 echo "ERROR ${var_name} is not defined! This variable is optional."
         fi
     done
 }
@@ -73,7 +75,7 @@ up_persistent_services() {
     )
 
     for service in ${persistent_services[@]}; do
-        if ! docker ps | grep "${service}"; then
+        if ! docker ps | grep "${service}" &> /dev/null; then
             docker-compose up -d --build --force-recreate --remove-orphans "${service}"
         fi
     done
@@ -81,7 +83,7 @@ up_persistent_services() {
 
 up_main_services() {
     # bring up main services
-    docker-compose up -d --force-recreate --remove-orphans api frontend
+    docker-compose up -d --build --force-recreate --remove-orphans api frontend
 }
 
 
