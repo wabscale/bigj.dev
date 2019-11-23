@@ -84,7 +84,7 @@ class LoginContent extends React.PureComponent {
       fetchPolicy: 'no-cache',
     }).then(({data}) => {
       const {token} = data.login;
-      localStorage.setItem('token', token);
+      // localStorage.setItem('token', token);
       cookies.set('token', token);
       switchView("View");
     }).catch(e => {

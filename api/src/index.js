@@ -41,9 +41,6 @@ server.applyMiddleware({app}); // /graphql
 
 const router = new Router();
 router.get('/', async ctx => {
-  await new Promise((resolve) => {
-    setTimeout(resolve, 1000);
-  });
   ctx.body = {
     success: true,
   };
@@ -63,7 +60,22 @@ app.use(fileRouter.routes());
 
 if (!!process.env.API_ROOT_PASSWORD) {
   const db = require('./db');
-  db.addUser('root', process.env.API_ROOT_PASSWORD);
+  db.getUserByUsername(
+    'root'
+  ).then(root => {
+    if (root) {
+      return console.log('root user already exists');
+    }
+    db.addUser(
+      'root',
+      process.env.API_ROOT_PASSWORD
+    ).then(() => (
+      console.log('added root user')
+    )).catch(e => (
+      console.error(e)
+    ));
+  })
+  
 }
 
 console.log("Listening!");
