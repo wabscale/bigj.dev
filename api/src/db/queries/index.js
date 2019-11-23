@@ -1,7 +1,8 @@
 const db = require('../models');
 const bcrypt = require('bcryptjs');
 var crypto = require("crypto");
-const {DOMAIN, OTP_TIMEOUT} = require('../../config.js');
+const {DOMAIN} = require('../../config.js');
+const validators = require('./validators');
 
 module.exports = {
   // get
@@ -26,6 +27,9 @@ module.exports = {
     let values = await db.Config.findAll({where: {key,}});
     return values.length >= 1 ? values[0] : null;
   },
+  getVisibleConfig: () => (
+    db.Config.findAll({where: {visible: true}})
+  ),
   getDownloadHistory: async (fileID) => (
     await db.DownloadHistory.findAll({
       where: {fileID},
@@ -64,24 +68,71 @@ module.exports = {
     await db.File.update({...file}, {where: {id: file.fileID}});
     return file;
   },
+  updateSettings: async (keys, values) => {
+    /*
+    This function will take key, value arrays for settings, and update accordingly.
+    For each mutable config key, there should be a corresponding validation
+    function in ./validation.js. The config row must also have visible to be true
+    in order for the user to mutate the row. This function will return any errors
+    from failing to update rows.
+     */
+    const errors = [];
+    const zip = (keys, values) => keys.map((key, index) => ({key, value: values[index]}));
+    for (const obj of zip(keys, values)) {
+      const {key, value} = obj;
+      const current = await db.Config.findOne({where: {key,}});
+      if (!(current && current.visible && validators[key](value))) {
+        errors.push({
+          message: 'Failed to update ' + key,
+        });
+      }
+      current.value = value;
+      current.save();
+    }
+    return errors;
+  },
 
   // verify
-  verifyOtp: async userOTP => {
+  verifyOtp: async (userOTP, file) => {
+    /*
+    This function should be called anytime a download request is seen that
+    specifies a otp. It should verify that the otp exists for the given file,
+    then check to make sure this request is within the timeout limit.
+
+    If we are enforcing the otp timeout, the clock starts after the first time
+    the otp is used.
+     */
     if (!userOTP) return false;
-    const otps = await db.OTP.findAll({where: {otp: userOTP,}});
-    const otp = otps.length === 1 ? otps[0] : null;
+    const otp = await db.OTP.findOne({
+      where: {
+        otp: userOTP,
+        fileID: file.id,
+      }
+    });
+
+    if (!otp) {
+      return false;
+    }
+
+    // We will want to enforce otp timeout if settings permit.
+    const otpTimeout = Number(await db.Config.findOne({
+      where: {
+        key: 'otpTimeout',
+      }
+    }));
+
+    /*
+    If usersetting otpTimeout is greater than 0, then we want to enforce
+    the timeout. Otherwise, the otp will be good forever.
+     */
+    if (otpTimeout > 0) {
+      if (!otp.downloadTime) {
+        otp.downloadTime = new Date().getTime();
+        otp.save();
+      }
+      return otp.downloadTime + otpTimeout * 60 > new Date().getTime();
+    }
 
     return !!otp;
-
-    // enforce time
-
-    /* if (!otp) return false;
-     * if (!otp.downloadTime) {
-     *   otp.downloadTime = new Date().getTime();
-     *   otp.save();
-     * }
-     * console.log(otp.downloadTime + OTP_TIMEOUT);
-     * console.log(new Date().getTime());
-     * return otp.downloadTime + OTP_TIMEOUT > new Date().getTime(); */
   }
 };

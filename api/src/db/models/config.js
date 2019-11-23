@@ -2,7 +2,8 @@
 module.exports = (sequelize, DataTypes) => {
   const Config = sequelize.define('Config', {
     key: DataTypes.STRING,
-    value: DataTypes.STRING
+    value: DataTypes.STRING,
+    visible: DataTypes.BOOLEAN
   }, {});
   Config.associate = function(models) {
     // associations can be defined here

@@ -59,7 +59,7 @@ export const GET_FILE_SIZE = gql`
 export const UPDATE_FILE = gql`
   mutation UpdateFile($fileID: ID!, $filename: String!, $isPublic: Boolean!) {
     updateFile(fileID: $fileID, filename: $filename, isPublic: $isPublic) {
-      filename,
+      filename
       isPublic
     }
   }
@@ -80,6 +80,27 @@ export const UPLOAD_FILE = gql`
     singleUpload(file: $file) {
       fileID
       filename
+    }
+  }
+`;
+
+export const GET_SETTINGS = gql`
+  query GetSettings {
+    getSettings {
+      key
+      value
+    }
+    
+    me {
+      username
+    }
+  }
+`;
+
+export const UPDATE_SETTINGS = gql`
+  mutation UpdateSettings($keys: [String]!, $values: [String]!) {
+    updateSettings(keys: $keys, values: $values) {
+      message
     }
   }
 `;

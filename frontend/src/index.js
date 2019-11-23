@@ -5,12 +5,15 @@ import {ApolloProvider} from 'react-apollo';
 import Paperbase from './Paperbase';
 import * as serviceWorker from './serviceWorker';
 
-const { createUploadLink } = require('apollo-upload-client');
-const { InMemoryCache } = require('apollo-cache-inmemory');
+const {createUploadLink} = require('apollo-upload-client');
+const {InMemoryCache} = require('apollo-cache-inmemory');
 
 const authFetch = (uri, options) => {
-  options.headers.token = localStorage.getItem('token');
-  return fetch(uri, options)
+  const token = localStorage.getItem('token');
+  if (!!token) {
+    options.headers.token = localStorage.getItem('token');
+  }
+  return fetch(uri, options);
 };
 
 const defaultOptions = {
@@ -20,7 +23,7 @@ const defaultOptions = {
   query: {
     fetchPolicy: 'no-cache',
   },
-}
+};
 
 const client = new ApolloClient({
   link: createUploadLink({

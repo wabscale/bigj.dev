@@ -16,6 +16,7 @@ import {faSignInAlt} from "@fortawesome/free-solid-svg-icons/faSignInAlt";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+import SettingsIcon from '@material-ui/icons/Settings';
 
 
 
@@ -24,7 +25,8 @@ const categories = [
     id: 'Files',
     children: [
       {id: 'View', icon: <FolderIcon/>},
-      {id: 'Upload', icon: <CloudUploadIcon/>}
+      {id: 'Upload', icon: <CloudUploadIcon/>},
+      {id: 'Settings', icon: <SettingsIcon/>}
     ],
   },
   {

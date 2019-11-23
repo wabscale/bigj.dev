@@ -42,7 +42,7 @@ check_env() {
     for var_name in ${required_env_vars[@]}; do
         if ! env | grep "^${var_name}=" &> /dev/null; then
             # if var not defined
-            >&2 echo "ERROR ${var_name} is not defined! This variable is required."
+            echo "ERROR ${var_name} is not defined! This variable is required." 1>&2
             exit 1
         fi
     done
@@ -54,7 +54,7 @@ check_env() {
     for var_name in ${required_env_vars[@]}; do
         if ! env | grep "^${var_name}=" &> /dev/null; then
             # if var not defined
-            >&2 echo "ERROR ${var_name} is not defined! This variable is optional."
+            echo "ERROR ${var_name} is not defined! This variable is optional." 1>&2
         fi
     done
 }

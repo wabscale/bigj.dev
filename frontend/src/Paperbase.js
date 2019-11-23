@@ -10,6 +10,7 @@ import FileContent from './File/FileContent';
 import LoginContent from './Login/LoginContent';
 import Header from './Header';
 import Upload from "./Upload/Upload";
+import Settings from "./Settings/Settings";
 
 let theme = createMuiTheme({
   typography: {
@@ -249,6 +250,10 @@ class Paperbase extends React.Component {
                     style={{height: "100%", width: "100%"}}
                   />,
                   'Upload': () => <Upload
+                    switchView={this.switchView}
+                    style={{height: "100%", width: "100%"}}
+                  />,
+                  'Settings': () => <Settings
                     switchView={this.switchView}
                     style={{height: "100%", width: "100%"}}
                   />

@@ -5,8 +5,7 @@ const {NODE_ENV} = process.env;
 
 const config = {
   UPLOAD_PATH: '/data',
-  DOMAIN: 'https://f.bigj.dev',
-  OTP_TIMEOUT: 500 * 1000
+  DOMAIN: process.env.API_DOMAIN,
 };
 
 if (!fs.existsSync(config.UPLOAD_PATH))
