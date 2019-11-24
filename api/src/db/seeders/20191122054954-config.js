@@ -21,12 +21,6 @@ module.exports = {
       createdAt: new Date(),
       updatedAt: new Date()
     }, {
-      key: 'otpTimeout',
-      value: '0',
-      visible: true,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }, {
       key: 'defaultPermission',
       value: 'private',
       visible: true,

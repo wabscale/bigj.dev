@@ -38,10 +38,11 @@ module.exports = {
   ),
   getOTP: async (fileID) => {
     const otp = crypto.randomBytes(8).toString('hex');
-    const file = await db.File.findAll({where: {id: fileID}});
+    const file = await db.File.findOne({where: {id: fileID}});
     await db.OTP.create({otp, fileID});
     return {
-      otp: `${DOMAIN}/f/${file[0].filename}?otp=${otp}`,
+      otp: `https://${DOMAIN}/f/${file.filename}?otp=${otp}`,
+      rawOtp: otp,
     };
   },
 
@@ -91,6 +92,48 @@ module.exports = {
     }
     return errors;
   },
+  updateOTP: async (otpValue, timeout) => {
+    /*
+    This should take the specified otp, and update its corresponding timeout value.
+    We should return any errors (if any).
+     */
+    const otp = await db.OTP.findOne({
+      where: {
+        otp: otpValue
+      }
+    });
+
+    if (!otp) {
+      return {
+        message: 'Invalid OTP'
+      };
+    }
+
+    /*
+    We want to be careful to not accidentally update an already expired timeout.
+     */
+    if (validators.isOTPExpired(otp)) {
+      return {
+        message: 'Failed to update',
+        description: 'OTP already expired'
+      };
+    }
+
+    // Verify user specified timeout is valid
+    if (isNaN(timeout) || timeout < 0) {
+      return {
+        message: 'Failed to update',
+        description: 'OTP already expired'
+      };
+    }
+
+    // Update timeout and save
+    otp.timeout = timeout;
+    otp.save();
+
+    // return no errors
+    return null;
+  },
 
   // verify
   verifyOtp: async (userOTP, file) => {
@@ -114,23 +157,16 @@ module.exports = {
       return false;
     }
 
-    // We will want to enforce otp timeout if settings permit.
-    const otpTimeout = Number(await db.Config.findOne({
-      where: {
-        key: 'otpTimeout',
-      }
-    }));
-
     /*
-    If usersetting otpTimeout is greater than 0, then we want to enforce
+    If otp.timout is greater than 0, then we want to enforce
     the timeout. Otherwise, the otp will be good forever.
      */
-    if (otpTimeout > 0) {
+    if (!!otp.timeout && otp.timeout > 0) {
       if (!otp.downloadTime) {
-        otp.downloadTime = new Date().getTime();
+        otp.downloadTime = new Date();
         otp.save();
       }
-      return otp.downloadTime + otpTimeout * 60 > new Date().getTime();
+      return validators.isOTPExpired(otp);
     }
 
     return !!otp;

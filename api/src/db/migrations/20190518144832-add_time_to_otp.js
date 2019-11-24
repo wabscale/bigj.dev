@@ -5,7 +5,7 @@ module.exports = {
     return queryInterface.addColumn(
       'OTPs',
       'downloadTime',
-      Sequelize.TIME
+      Sequelize.DATE
     );
   },
 
