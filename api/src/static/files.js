@@ -16,6 +16,7 @@ router.get('/:requestedFilename', async (ctx, next) => {
    */
   const {user} = ctx.state;
   const {otp} = ctx.request.query;
+
   /*
    ctx.request.ip will be the traefik ip. We want to record the client ip,
    that will likely be in the x-forwarded-for header.

@@ -35,6 +35,10 @@ const typeDefs = gql`
       keys: [String]!, 
       values: [String]!
     ): [Error]!
+    updateOTP(
+      otp: String!, 
+      timeout: Int!
+    ): Error 
   }
 
   type UploadFile {
@@ -67,6 +71,7 @@ const typeDefs = gql`
 
   type OTP {
     otp: String!
+    rawOtp: String
   }
   
   type Setting {

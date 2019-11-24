@@ -27,6 +27,7 @@ import {
 import {humanSize} from "../utils";
 import FileExpand from './FileExpand';
 import HistoryExpand from "./HistoryExpand";
+import OTPExpand from "./OTPExpand";
 
 const styles = theme => ({
   paper: {
@@ -190,10 +191,9 @@ class File extends PureComponent {
                     }
                   })}
                 />
-                <FileExpand
+                <OTPExpand
                   heading="One Time Password"
-                  query={GET_OTP}
-                  args={{fileID}}
+                  fileID={fileID}
                   reshape={data => [
                     <Link href={data.getOTP.otp}>
                       {data.getOTP.otp}

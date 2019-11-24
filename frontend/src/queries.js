@@ -44,6 +44,7 @@ export const GET_OTP = gql`
   query GetOtp($fileID: ID!) {
     getOTP(fileID: $fileID) {
       otp
+      rawOtp
     }
   }
 `;
@@ -101,6 +102,15 @@ export const UPDATE_SETTINGS = gql`
   mutation UpdateSettings($keys: [String]!, $values: [String]!) {
     updateSettings(keys: $keys, values: $values) {
       message
+    }
+  }
+`;
+
+export const UPDATE_OTP = gql`
+  mutation  UpdateOTP($otp: String!, $timeout: Int!) {
+    updateOTP(otp: $otp, timeout: $timeout) {
+      message
+      description
     }
   }
 `;

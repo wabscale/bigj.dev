@@ -13,7 +13,8 @@ const {
   deleteFileById,
   addFile,
   getVisibleConfig,
-  updateSettings
+  updateSettings,
+  updateOTP
 } = require('../db');
 
 const requiresLogin = resolver => (parent, args, ctx, info) => {
@@ -165,8 +166,9 @@ const resolvers = {
     updateFile: requiresLogin((_, {fileID, filename, isPublic}) => handleFileUpdate({fileID, filename, isPublic})),
     // register: (_, {username, password}) => createUser(username, password),
     deleteFile: requiresLogin((_, {fileID}) => yeetFile(fileID)),
-    singleUpload: requiresLogin(async (_, {file}) => handleUpload(file)),
-    updateSettings: requiresLogin(async (_, {keys, values}) => updateSettings(keys, values)),
+    singleUpload: requiresLogin((_, {file}) => handleUpload(file)),
+    updateSettings: requiresLogin((_, {keys, values}) => updateSettings(keys, values)),
+    updateOTP: requiresLogin((_, {otp, timeout}) => updateOTP(otp, timeout))
   },
 };
 
