@@ -98,7 +98,7 @@ class Settings extends Component {
                 </Grid>
               );
             if (error) {
-              // setTimeout(() => switchView('Sign In'), 250);
+              setTimeout(() => switchView('Sign In'), 250);
               return (
                 <Fragment/>
               );
