@@ -82,7 +82,7 @@ class Upload extends Component {
 
   handleUnauth = () => {
     const {switchView} = this.props;
-    // switchView('Sign In');
+    switchView('Sign In');
   };
 
   deleteFile = nameToDel => {
