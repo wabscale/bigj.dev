@@ -85,6 +85,10 @@ class LoginContent extends React.PureComponent {
     }).then(({data}) => {
       client.resetStore(); // yeet cache
       const {token} = data.login;
+      if (cookies.get('token')) {
+        // If cookie already exists, clear it.
+        cookies.remove('token');
+      }
       cookies.set('token', token);
       switchView("View");
     }).catch(e => {
