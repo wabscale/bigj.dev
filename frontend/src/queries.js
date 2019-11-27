@@ -107,10 +107,27 @@ export const UPDATE_SETTINGS = gql`
 `;
 
 export const UPDATE_OTP = gql`
-  mutation  UpdateOTP($otp: String!, $timeout: Int!) {
+  mutation UpdateOTP($otp: String!, $timeout: Int!) {
     updateOTP(otp: $otp, timeout: $timeout) {
       message
       description
+    }
+  }
+`;
+
+export const WHOAMI = gql`
+  {
+    me {
+      username
+    }
+  }
+`;
+
+export const GET_CONFIG = gql`
+  query GetConfig($key: String!){
+    getSetting(key: $key) {
+      key
+      value
     }
   }
 `;

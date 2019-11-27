@@ -26,6 +26,12 @@ module.exports = {
       visible: true,
       createdAt: new Date(),
       updatedAt: new Date()
+    }, {
+      key: 'siteTitle',
+      value: 'f.bigj.dev',
+      visible: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
     }], {});
   },
 

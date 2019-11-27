@@ -1,9 +1,10 @@
 import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {createMuiTheme, MuiThemeProvider, withStyles} from '@material-ui/core/styles';
+import CircularProgress from "@material-ui/core/CircularProgress";
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Hidden from '@material-ui/core/Hidden';
-import {withApollo} from "react-apollo";
+import {withApollo, Query} from "react-apollo";
 import Cookies from 'universal-cookie';
 import Navigator from './Navigator';
 import FileContent from './File/FileContent';
@@ -11,124 +12,8 @@ import LoginContent from './Login/LoginContent';
 import Header from './Header';
 import Upload from "./Upload/Upload";
 import Settings from "./Settings/Settings";
-
-let theme = createMuiTheme({
-  typography: {
-    useNextVariants: true,
-    h5: {
-      fontWeight: 500,
-      fontSize: 26,
-      letterSpacing: 0.5,
-    },
-  },
-  palette: {
-    type: 'dark',
-    // background: '#280680',
-    primary: {
-      light: '#63ccff',
-      main: '#009be5',
-      dark: '#006db3',
-    },
-  },
-  shape: {
-    borderRadius: 8,
-  },
-});
-
-theme = {
-  ...theme,
-  overrides: {
-    MuiDrawer: {
-      paper: {
-        backgroundColor: '#18202c',
-      },
-    },
-    MuiButton: {
-      label: {
-        textTransform: 'initial',
-      },
-      contained: {
-        boxShadow: 'none',
-        '&:active': {
-          boxShadow: 'none',
-        },
-      },
-    },
-    MuiTabs: {
-      root: {
-        marginLeft: theme.spacing(1),
-      },
-      indicator: {
-        height: 3,
-        borderTopLeftRadius: 3,
-        borderTopRightRadius: 3,
-        backgroundColor: theme.palette.common.white,
-      },
-    },
-    MuiTab: {
-      root: {
-        textTransform: 'initial',
-        margin: '0 16px',
-        minWidth: 0,
-        [theme.breakpoints.up('md')]: {
-          minWidth: 0,
-        },
-      },
-      labelContainer: {
-        padding: 0,
-        [theme.breakpoints.up('md')]: {
-          padding: 0,
-        },
-      },
-    },
-    MuiIconButton: {
-      root: {
-        padding: theme.spacing(1),
-      },
-    },
-    MuiTooltip: {
-      tooltip: {
-        borderRadius: 4,
-      },
-    },
-    MuiDivider: {
-      root: {
-        backgroundColor: '#404854',
-      },
-    },
-    MuiListItemText: {
-      primary: {
-        fontWeight: theme.typography.fontWeightMedium,
-      },
-    },
-    MuiListItemIcon: {
-      root: {
-        color: 'inherit',
-        marginRight: 0,
-        '& svg': {
-          fontSize: 20,
-        },
-      },
-    },
-    MuiAvatar: {
-      root: {
-        width: 32,
-        height: 32,
-      },
-    },
-  },
-  props: {
-    MuiTab: {
-      disableRipple: true,
-    },
-  },
-  mixins: {
-    ...theme.mixins,
-    toolbar: {
-      minHeight: 48,
-    },
-  },
-};
+import {WHOAMI, GET_CONFIG} from './queries';
+import theme from './theme';
 
 const uiBreakpoints = {
   "mobile": {maxWidth: 550, maxHeight: 850, pixelDensity: 2}
@@ -159,30 +44,75 @@ const styles = {
   },
 };
 
+const Main = withStyles(styles)(function(props) {
+  const {
+    classes,
+    active,
+    switchView,
+    clearAuth,
+  } = props;
+
+  return (
+    <Query
+      query={WHOAMI}
+      fetchPolicy={'network-only'}
+    >
+      {({data, error, loading}) => {
+        if (loading)
+          return (
+            <CircularProgress className={classes.progress}/>
+          );
+        if (error) {
+          clearAuth();
+          setTimeout(() => switchView('Sign In'), 250);
+          return <div/>;
+        }
+
+        const MainComponent = {
+          'View': FileContent,
+          'Sign In': LoginContent,
+          'Upload': Upload,
+          'Settings': Settings
+        }[active];
+
+        return (
+          <MainComponent
+            switchView={switchView}
+            style={{height: "100%", width: "100%"}}
+            displayCount={9}
+          />
+        );
+      }}
+    </Query>
+  );
+});
+
 class Paperbase extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       mobileOpen: false,
+      siteTitle: '',
       active: 'View',
     };
-
-    this.handleDrawerToggle = this.handleDrawerToggle.bind(this);
-    this.switchView = this.switchView.bind(this);
   }
 
   handleDrawerToggle = () => {
     this.setState(state => ({mobileOpen: !state.mobileOpen}));
   };
 
-  switchView(id) {
-    if (id === "Sign Out") {
-      const {client} = this.props;
-      const cookies = new Cookies();
+  clearAuth = () => {
+    const cookies = new Cookies();
 
-      cookies.remove('token');
-      localStorage.removeItem('token');
-      client.resetStore(); // yeet cache
+    cookies.remove('token');
+    localStorage.clear();
+  };
+
+  switchView = id => {
+    if (id === "Sign Out") {
+      // const {client} = this.props;
+      this.clearAuth();
+      // client.resetStore(); // yeet cache
 
       id = 'Sign In';
     }
@@ -191,25 +121,25 @@ class Paperbase extends React.Component {
     });
   }
 
-  isMobileUI = () => {
-    const {maxHeight: height, maxWidth: width, pixelDensity} = uiBreakpoints.mobile;
+  componentDidMount() {
+    const {client} = this.props;
 
-    let currHeight, currWidth;
-
-    if (this.state) {
-      currWidth = this.state.width;
-      currHeight = this.state.height;
-    } else {
-      currWidth = window.innerWidth;
-      currHeight = window.innerHeight;
-    }
-
-    return currHeight <= height && currWidth < width && window.devicePixelRatio >= pixelDensity;
-  };
+    client.query({
+      query: GET_CONFIG,
+      variables: {
+        key: 'siteTitle',
+      },
+    }).then(({data}) => {
+      const siteTitle = data.getSetting.value;
+      this.setState({siteTitle});
+    })
+  }
 
   render() {
     const {classes} = this.props;
-    const {active} = this.state;
+    let {active, siteTitle} = this.state;
+
+    document.title = siteTitle;
 
     return (
       <MuiThemeProvider theme={theme}>
@@ -232,33 +162,18 @@ class Paperbase extends React.Component {
                 switchView={this.switchView}
                 active={this.state.active}
                 onDrawerToggle={this.handleDrawerToggle}
+                siteTitle={siteTitle}
               />
             </Hidden>
           </nav>
           <div className={classes.appContent}>
             <Header onDrawerToggle={this.handleDrawerToggle}/>
             <main className={classes.mainContent}>
-              {
-                {
-                  'View': () => <FileContent
-                    switchView={this.switchView}
-                    style={{height: "100%", width: "100%"}}
-                    displayCount={9}
-                  />,
-                  'Sign In': () => <LoginContent
-                    switchView={this.switchView}
-                    style={{height: "100%", width: "100%"}}
-                  />,
-                  'Upload': () => <Upload
-                    switchView={this.switchView}
-                    style={{height: "100%", width: "100%"}}
-                  />,
-                  'Settings': () => <Settings
-                    switchView={this.switchView}
-                    style={{height: "100%", width: "100%"}}
-                  />
-                }[active]()
-              }
+              <Main
+                switchView={this.switchView}
+                clearAuth={this.clearAuth}
+                active={active}
+              />
             </main>
           </div>
         </div>
