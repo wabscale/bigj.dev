@@ -85,9 +85,9 @@ export const UPLOAD_FILE = gql`
   }
 `;
 
-export const GET_SETTINGS = gql`
-  query GetSettings {
-    getSettings {
+export const GET_ALL_CONFIG = gql`
+  query GetAllConfig {
+    getAllConfig {
       key
       value
     }
@@ -98,9 +98,9 @@ export const GET_SETTINGS = gql`
   }
 `;
 
-export const UPDATE_SETTINGS = gql`
-  mutation UpdateSettings($keys: [String]!, $values: [String]!) {
-    updateSettings(keys: $keys, values: $values) {
+export const UPDATE_CONFIG = gql`
+  mutation UpdateConfig($keys: [String]!, $values: [String]!) {
+    updateConfig(keys: $keys, values: $values) {
       message
     }
   }
@@ -125,7 +125,7 @@ export const WHOAMI = gql`
 
 export const GET_CONFIG = gql`
   query GetConfig($key: String!){
-    getSetting(key: $key) {
+    getConfig(key: $key) {
       key
       value
     }
