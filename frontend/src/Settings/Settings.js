@@ -11,7 +11,7 @@ import Typography from "@material-ui/core/Typography";
 import Chip from '@material-ui/core/Chip';
 import Grow from '@material-ui/core/Grow';
 
-import {GET_SETTINGS, UPDATE_SETTINGS} from '../queries';
+import {GET_ALL_CONFIG, UPDATE_CONFIG} from '../queries';
 
 
 const styles = theme => ({
@@ -64,14 +64,14 @@ class Settings extends Component {
   save = client => {
     const {settingState} = this.state;
     client.mutate({
-      mutation: UPDATE_SETTINGS,
+      mutation: UPDATE_CONFIG,
       variables: {
         keys: Object.keys(settingState),
         values: Object.values(settingState)
       },
       fetchPolicy: 'no-cache'
     }).then(({data}) => {
-      this.setState({errors: data.updateSettings});
+      this.setState({errors: data.updateConfig});
     });
   };
 
@@ -86,7 +86,7 @@ class Settings extends Component {
         className={classes.root}
       >
         <Query
-          query={GET_SETTINGS}
+          query={GET_ALL_CONFIG}
           fetchPolicy={'no-cache'}
           // pollInterval={3000}
         >
@@ -104,7 +104,7 @@ class Settings extends Component {
               );
             }
 
-            const settings = data.getSettings;
+            const allConfig = data.getAllConfig;
 
 
             return (
@@ -161,7 +161,7 @@ class Settings extends Component {
                             Settings
                           </Typography>
                         </Grid>
-                        {settings.map(({key, value}) => (
+                        {allConfig.map(({key, value}) => (
                           <Grid item xs key={key}>
                             <TextField
                               id="outlined-name"

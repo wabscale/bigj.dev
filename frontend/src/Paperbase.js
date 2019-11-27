@@ -126,7 +126,7 @@ class Paperbase extends React.Component {
         key: 'siteTitle',
       },
     }).then(({data}) => {
-      const siteTitle = data.getSetting.value;
+      const siteTitle = data.getConfig.value;
       this.setState({siteTitle});
     })
   }

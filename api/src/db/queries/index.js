@@ -6,27 +6,24 @@ const validators = require('./validators');
 
 module.exports = {
   // get
-  getFiles: async () => await db.File.findAll(),
-  getFileById: async id => {
-    let files = await db.File.findAll({where: {id,}});
-    return files.length === 1 ? files[0] : null;
-  },
-  getFileByFilename: async filename => {
-    let files = await db.File.findAll({where: {filename,}});
-    return files.length === 1 ? files[0] : null;
-  },
-  getUserById: async id => {
-    let users = await db.User.findAll({where: {id,}});
-    return users.length === 1 ? users[0] : null;
-  },
-  getUserByUsername: async username => {
-    let users = await db.User.findAll({where: {username,}});
-    return users.length === 1 ? users[0] : null;
-  },
-  getConfig: async (key) => {
-    let values = await db.Config.findAll({where: {key,}});
-    return values.length >= 1 ? values[0] : null;
-  },
+  getFiles: async () => (
+    await db.File.findAll()
+  ),
+  getFileById: async id => (
+    await db.File.findOne({where: {id,}})
+  ),
+  getFileByFilename: async filename => (
+    await db.File.findOne({where: {filename,}})
+  ),
+  getUserById: async id => (
+     await db.User.findOne({where: {id,}})
+  ),
+  getUserByUsername: async username => (
+    await db.User.findOne({where: {username,}})
+  ),
+  getConfig: async (key) => (
+    await db.Config.findOne({where: {key,}})
+  ),
   getAllVisibleConfig: () => (
     db.Config.findAll({where: {visible: true}})
   ),
@@ -56,8 +53,12 @@ module.exports = {
   addUser: async (username, password) => (
     await db.User.create({username, password: bcrypt.hashSync(password, 10)})
   ),
-  addConfig: (key, value) => db.Config.create({key, value}),
-  addDownload: (fileID, ipAddress, allowed) => db.DownloadHistory.create({fileID, ipAddress, allowed}),
+  addConfig: (key, value) => (
+    db.Config.create({key, value})
+  ),
+  addDownload: (fileID, ipAddress, allowed) => (
+    db.DownloadHistory.create({fileID, ipAddress, allowed})
+  ),
 
   // delete
   deleteFileByFilename: async ({filename}) => (

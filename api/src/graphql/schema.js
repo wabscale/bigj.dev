@@ -19,8 +19,8 @@ const typeDefs = gql`
     ): Token!
     
     """Settings"""
-    getSettings: [Setting]!
-    getSetting(key: String!): Setting!
+    getAllConfig: [Config]!
+    getConfig(key: String!): Config!
   }
 
   type Mutation {
@@ -32,7 +32,7 @@ const typeDefs = gql`
     deleteFile(fileID: ID!): File!
     """register(username: String!, password: String!): Token!"""
     singleUpload(file: Upload!): UploadFile!
-    updateSettings(
+    updateConfig(
       keys: [String]!, 
       values: [String]!
     ): [Error]!
@@ -75,7 +75,7 @@ const typeDefs = gql`
     rawOtp: String
   }
   
-  type Setting {
+  type Config {
     key: String!
     value: String!
   }
