@@ -41,22 +41,36 @@ const update = async (ctx, next) => {
   const defaultPermission = await getConfig('defaultPermission');
   const isPublic = defaultPermission.value === '1';
 
-  // Handle deleting rows for removed files and creating rows for new files
-  deletedFiles.forEach(filename => deleteFileByFilename({filename}));
-  newFiles.forEach(filename => addFile({
-    filename,
-    isPublic,
-    size: getFileSize(`${UPLOAD_PATH}/${filename}`),
-  }));
+  /*
+  There is a chance for a race condition at this step. If two requests come in at the same time,
+  and this part of the chain runs at the same time, then we will get duplicate rows for the same file.
+  To avoid this, I've added a unique constraint to the File model.
 
-  let files = await getFiles();
-  files.forEach(file => {
-    // Record size of file (in bytes) for each row.
-    file.size = getFileSize(`${UPLOAD_PATH}/${file.filename}`);
+  In the event that we have two workers running this function, to avoid a nasty 500 we can simply ignore the error
+  caused in the database by the unique constraint. This isn't the most grateful solution to this race
+  condition, but it will work for now.
+   */
 
-    // This save will only run an update query if the value of size was changed.
-    file.save();
-  });
+  try {
+    // Handle deleting rows for removed files and creating rows for new files
+    deletedFiles.forEach(filename => deleteFileByFilename({filename}));
+    newFiles.forEach(filename => addFile({
+      filename,
+      isPublic,
+      size: getFileSize(`${UPLOAD_PATH}/${filename}`),
+    }));
+
+    let files = await getFiles();
+    files.forEach(file => {
+      // Record size of file (in bytes) for each row.
+      file.size = getFileSize(`${UPLOAD_PATH}/${file.filename}`);
+
+      // This save will only run an update query if the value of size was changed.
+      file.save();
+    });
+  } catch (e) {
+    console.error(e, 'Race condition avoided');
+  }
 
   await next();
 };
