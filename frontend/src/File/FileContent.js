@@ -1,4 +1,4 @@
-import React, {Fragment, PureComponent, Component} from 'react';
+import React, {Component, Fragment, PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -12,7 +12,7 @@ import FormControl from "@material-ui/core/FormControl";
 import IconButton from '@material-ui/core/IconButton';
 import Input from '@material-ui/core/Input';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import {Query, Mutation} from 'react-apollo';
+import {Mutation, Query, withApollo} from 'react-apollo';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from '@material-ui/core/Typography';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
@@ -23,9 +23,8 @@ import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import {animateScroll} from "react-scroll";
 
-import {GET_FILE, GET_FILES, UPLOAD_FILE} from '../queries';
+import {GET_FILES, UPLOAD_FILE} from '../queries';
 import File from './File';
-import {withApollo} from "react-apollo";
 
 const styles = theme => ({
   root: {

@@ -19,7 +19,6 @@ import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import SettingsIcon from '@material-ui/icons/Settings';
 
 
-
 const categories = [
   {
     id: 'Files',
@@ -86,7 +85,7 @@ const styles = theme => ({
 });
 
 function Navigator(props) {
-  const {classes, onDrawerToggle, switchView, api, siteTitle, ...other} = props;
+  const {classes, onDrawerToggle, switchView, api, ...other} = props;
 
   return (
     <Drawer variant="permanent" {...other} onClose={onDrawerToggle} className={classes.root}>
@@ -100,7 +99,7 @@ function Navigator(props) {
           >
             <MenuIcon/>
           </IconButton>
-          {siteTitle}
+          {document.title}
         </ListItem>
         <ListItem className={classNames(classes.item, classes.itemCategory)}>
           <ListItemIcon>

@@ -1,10 +1,10 @@
-import React, {Fragment} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import {createMuiTheme, MuiThemeProvider, withStyles} from '@material-ui/core/styles';
+import {MuiThemeProvider, withStyles} from '@material-ui/core/styles';
 import CircularProgress from "@material-ui/core/CircularProgress";
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Hidden from '@material-ui/core/Hidden';
-import {withApollo, Query} from "react-apollo";
+import {Query, withApollo} from "react-apollo";
 import Cookies from 'universal-cookie';
 import Navigator from './Navigator';
 import FileContent from './File/FileContent';
@@ -12,12 +12,8 @@ import LoginContent from './Login/LoginContent';
 import Header from './Header';
 import Upload from "./Upload/Upload";
 import Settings from "./Settings/Settings";
-import {WHOAMI, GET_CONFIG} from './queries';
+import {GET_CONFIG, WHOAMI} from './queries';
 import theme from './theme';
-
-const uiBreakpoints = {
-  "mobile": {maxWidth: 550, maxHeight: 850, pixelDensity: 2}
-};
 
 const drawerWidth = 256;
 
@@ -162,7 +158,6 @@ class Paperbase extends React.Component {
                 switchView={this.switchView}
                 active={this.state.active}
                 onDrawerToggle={this.handleDrawerToggle}
-                siteTitle={siteTitle}
               />
             </Hidden>
           </nav>
