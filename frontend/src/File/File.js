@@ -1,4 +1,4 @@
-import React, {PureComponent, Fragment} from 'react';
+import React, {Fragment, PureComponent} from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Paper from '@material-ui/core/Paper';
@@ -16,14 +16,8 @@ import Link from '@material-ui/core/Link';
 import PropTypes from "prop-types";
 import Grow from '@material-ui/core/Grow';
 import Typography from '@material-ui/core/Typography';
-import {withApollo, Mutation} from 'react-apollo';
-import {
-  GET_DOWNLOAD_HISTORY,
-  GET_OTP,
-  GET_FILE_SIZE,
-  UPDATE_FILE,
-  DELETE_FILE
-} from "../queries";
+import {Mutation, withApollo} from 'react-apollo';
+import {DELETE_FILE, GET_DOWNLOAD_HISTORY, GET_FILE_SIZE, UPDATE_FILE} from "../queries";
 import {humanSize} from "../utils";
 import FileExpand from './FileExpand';
 import HistoryExpand from "./HistoryExpand";
