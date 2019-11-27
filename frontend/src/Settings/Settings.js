@@ -5,13 +5,14 @@ import {withStyles} from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import CircularProgress from "@material-ui/core/CircularProgress";
-import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Typography from "@material-ui/core/Typography";
 import Chip from '@material-ui/core/Chip';
 import Grow from '@material-ui/core/Grow';
 
 import {GET_ALL_CONFIG, UPDATE_CONFIG} from '../queries';
+import StringConfig from "./StringConfig";
+import BooleanConfig from "./BooleanConfig";
 
 
 const styles = theme => ({
@@ -59,6 +60,7 @@ class Settings extends Component {
       settingState: {},
       errors: null,
     };
+    this.allConfig = null;
   }
 
   save = client => {
@@ -73,6 +75,15 @@ class Settings extends Component {
     }).then(({data}) => {
       this.setState({errors: data.updateConfig});
     });
+  };
+
+  initSettingState = () => {
+    const {allConfig} = this;
+    const {settingState} = this.state;
+    allConfig.forEach(({key, value}) => {
+      settingState[key] = value;
+    });
+    this.setState({settingState});
   };
 
   render() {
@@ -105,7 +116,11 @@ class Settings extends Component {
             }
 
             const allConfig = data.getAllConfig;
-
+            if (this.allConfig === null) {
+              this.allConfig = allConfig;
+              setTimeout(this.initSettingState, 100);
+              return null;
+            }
 
             return (
               <ApolloConsumer>
@@ -139,9 +154,9 @@ class Settings extends Component {
                                             item.message !== err.message
                                           ));
                                           if (copy.length === 0) {
-                                            return { errors: null };
+                                            return {errors: null};
                                           }
-                                          return { errors: copy };
+                                          return {errors: copy};
                                         })}
                                       />
                                     ))}
@@ -161,25 +176,36 @@ class Settings extends Component {
                             Settings
                           </Typography>
                         </Grid>
-                        {allConfig.map(({key, value}) => (
-                          <Grid item xs key={key}>
-                            <TextField
-                              id="outlined-name"
-                              label={key}
-                              className={classes.textField}
-                              defaultValue={value}
-                              value={settingState[key]}
-                              onChange={({target}) => this.setState(({settingState}) => ({
-                                settingState: {
-                                  ...settingState,
-                                  [key]: target.value,
-                                }
-                              }))}
-                              margin="normal"
-                              variant="outlined"
-                            />
-                          </Grid>
-                        ))}
+                        {allConfig.map(({key, value, valueType}) => {
+
+                          switch (valueType) {
+                            case 'string': return (
+                                <Grid item xs key={key}>
+                                  <StringConfig
+                                    label={key}
+                                    value={settingState[key]}
+                                    onChange={({target}) => this.setState(({settingState}) => {
+                                      settingState[key] = target.value;
+                                      return {settingState};
+                                    })}
+                                  />
+                                </Grid>
+                              );
+                            case 'boolean': return (
+                                <Grid item xs key={key}>
+                                  <BooleanConfig
+                                    label={key}
+                                    value={settingState[key]}
+                                    onChange={() => this.setState(({settingState}) => {
+                                      settingState[key] = settingState[key] === '1' ? '0' : '1';
+                                      return {settingState};
+                                    })}
+                                  />
+                                </Grid>
+                              );
+                            default: return null;
+                          }
+                        })}
                         <Grid item xs key={'save-button'}>
                           <Button
                             variant="contained"

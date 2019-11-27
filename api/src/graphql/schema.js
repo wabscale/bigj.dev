@@ -78,6 +78,7 @@ const typeDefs = gql`
   type Config {
     key: String!
     value: String!
+    valueType: String
   }
   
   type Error {

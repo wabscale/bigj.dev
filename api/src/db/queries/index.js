@@ -54,7 +54,7 @@ module.exports = {
     await db.User.create({username, password: bcrypt.hashSync(password, 10)})
   ),
   addConfig: (key, value) => (
-    db.Config.create({key, value})
+    db.Config.create({key, value, visible: true})
   ),
   addDownload: (fileID, ipAddress, allowed) => (
     db.DownloadHistory.create({fileID, ipAddress, allowed})

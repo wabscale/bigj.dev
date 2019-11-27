@@ -90,6 +90,7 @@ export const GET_ALL_CONFIG = gql`
     getAllConfig {
       key
       value
+      valueType
     }
     
     me {

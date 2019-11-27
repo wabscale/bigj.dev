@@ -39,7 +39,7 @@ const update = async (ctx, next) => {
 
   // Get the default isPublic value
   const defaultPermission = await getConfig('defaultPermission');
-  const isPublic = defaultPermission.value === 'public';
+  const isPublic = defaultPermission.value === '1';
 
   // Handle deleting rows for removed files and creating rows for new files
   deletedFiles.forEach(filename => deleteFileByFilename({filename}));
