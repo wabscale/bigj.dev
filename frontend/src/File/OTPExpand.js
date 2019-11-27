@@ -95,7 +95,7 @@ class OTPExpand extends React.Component {
                       <Grid item xs>
                         <Mutation mutation={UPDATE_OTP}>
                           {updateOtp => (
-                            <Fragment>
+                            <Fragment>;
                               <TextField
                                 id="outlined-name"
                                 label="Timeout"

@@ -27,8 +27,11 @@ module.exports = {
     let values = await db.Config.findAll({where: {key,}});
     return values.length >= 1 ? values[0] : null;
   },
-  getVisibleConfig: () => (
+  getAllVisibleConfig: () => (
     db.Config.findAll({where: {visible: true}})
+  ),
+  getVisibleConfig: key => (
+    db.Config.findOne({where: {visible: true, key}})
   ),
   getDownloadHistory: async (fileID) => (
     await db.DownloadHistory.findAll({

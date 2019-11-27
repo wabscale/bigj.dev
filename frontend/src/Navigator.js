@@ -86,7 +86,7 @@ const styles = theme => ({
 });
 
 function Navigator(props) {
-  const {classes, onDrawerToggle, switchView, api, ...other} = props;
+  const {classes, onDrawerToggle, switchView, api, siteTitle, ...other} = props;
 
   return (
     <Drawer variant="permanent" {...other} onClose={onDrawerToggle} className={classes.root}>
@@ -100,7 +100,7 @@ function Navigator(props) {
           >
             <MenuIcon/>
           </IconButton>
-          bigj.dev
+          {siteTitle}
         </ListItem>
         <ListItem className={classNames(classes.item, classes.itemCategory)}>
           <ListItemIcon>

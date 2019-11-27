@@ -170,7 +170,7 @@ class FileContent extends Component {
   };
 
   render() {
-    const {classes, switchView, displayCount} = this.props;
+    const {classes, displayCount} = this.props;
     const {searchTerm, activeStep, moving} = this.state;
     const {fileCount} = this.state;
     const steps = Math.ceil(fileCount / displayCount);
@@ -230,7 +230,7 @@ class FileContent extends Component {
           </Grid>
           <Query
             query={GET_FILES}
-            fetchPolicy={'no-cache'}
+            fetchPolicy={'network-only'}
             pollInterval={3000}
           >
             {({data, loading, error}) => {
@@ -241,7 +241,6 @@ class FileContent extends Component {
                   </Grid>
                 );
               if (error) {
-                setTimeout(() => switchView('Sign In'), 250);
                 return (
                   <Fragment/>
                 );

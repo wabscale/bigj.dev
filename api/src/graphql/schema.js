@@ -20,6 +20,7 @@ const typeDefs = gql`
     
     """Settings"""
     getSettings: [Setting]!
+    getSetting(key: String!): Setting!
   }
 
   type Mutation {

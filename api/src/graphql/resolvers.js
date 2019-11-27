@@ -12,6 +12,7 @@ const {
   getFileById,
   deleteFileById,
   addFile,
+  getAllVisibleConfig,
   getVisibleConfig,
   updateSettings,
   updateOTP
@@ -154,13 +155,12 @@ const resolvers = {
   Query: {
     files: requiresLogin(getAllFiles),
     file: requiresLogin((_, {fileID}) => getFile(fileID)),
-    me: requiresLogin((_, __, ctx) => ({
-      username: ctx.state.user.username,
-    })),
+    me: requiresLogin((_, __, ctx) => ({username: ctx.state.user.username})),
     login: (_, {username, password}) => ({token: generateToken(username, password)}),
     fileHistory: requiresLogin((_, {fileID}) => transformDownloadHistory(getDownloadHistory(fileID))),
     getOTP: requiresLogin((_, {fileID}) => getOTP(fileID)),
-    getSettings: requiresLogin(getVisibleConfig),
+    getSettings: requiresLogin(getAllVisibleConfig),
+    getSetting: requiresLogin((_, {key}) => getVisibleConfig(key))
   },
   Mutation: {
     updateFile: requiresLogin((_, {fileID, filename, isPublic}) => handleFileUpdate({fileID, filename, isPublic})),
