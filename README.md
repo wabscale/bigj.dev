@@ -9,7 +9,7 @@ I use this to generate links for resources that I want to share with friends.
 By self hosting these files, I have full control over access of my files, along with logs for downloads.
 Please use this as a tool to take back control of your data.
 
-![img](./img/1574321343.png)
+![img](./img/1574963960.png)
 
 ## Features
 - Short memorable shareable links
