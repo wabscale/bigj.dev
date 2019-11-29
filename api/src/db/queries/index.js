@@ -1,75 +1,147 @@
 const db = require('../models');
 const bcrypt = require('bcryptjs');
-var crypto = require("crypto");
+const crypto = require("crypto");
 const {DOMAIN} = require('../../config.js');
 const validators = require('./validators');
 
 module.exports = {
   // get
-  getFiles: async () => (
-    await db.File.findAll()
+  getFiles: () => (
+    /**
+     * This function will get all the current files from the database.
+     * The File table should be kept in sync with the filesystem with
+     * the middleware specified in src/graphql/files.js
+     */
+    db.File.findAll()
   ),
-  getFileById: async id => (
-    await db.File.findOne({where: {id,}})
+  getFileById: id => (
+    /**
+     * This gets a single row for a File by specified File.id.
+     */
+    db.File.findOne({where: {id,}})
   ),
-  getFileByFilename: async filename => (
-    await db.File.findOne({where: {filename,}})
+  getFileByFilename: filename => (
+    /**
+     * This will get a single row for a file by filename. Now
+     * that there is a unique constraint on File.filename in
+     * the database, you are guaranteed that if the file exists,
+     * this function will return its one and only row.
+     */
+    db.File.findOne({where: {filename,}})
   ),
-  getUserById: async id => (
-     await db.User.findOne({where: {id,}})
+  getUserById: id => (
+    /**
+     * This will get a User row by User.id.
+     */
+    db.User.findOne({where: {id,}})
   ),
-  getUserByUsername: async username => (
-    await db.User.findOne({where: {username,}})
+  getUserByUsername: username => (
+    /**
+     * This will get a User row by User.username.
+     */
+    db.User.findOne({where: {username,}})
   ),
-  getConfig: async (key) => (
-    await db.Config.findOne({where: {key,}})
+  getConfig: key => (
+    /**
+     * This will get a Config row by Config.key.
+     */
+    db.Config.findAll({where: {key,}})
   ),
   getAllVisibleConfig: () => (
+    /**
+     * All config rows have a boolean value (Config.visible) that
+     * specifies whether or not users should be able to see and modify
+     * that row. This function will get all rows in the config table
+     * that the user should have access to (read and write).
+     */
     db.Config.findAll({where: {visible: true}})
   ),
   getVisibleConfig: key => (
+    /**
+     * This will get a Config row by key. Since this used by the graphql api,
+     * there is an extra constraint on the row being visible.
+     */
     db.Config.findOne({where: {visible: true, key}})
   ),
-  getDownloadHistory: async (fileID) => (
-    await db.DownloadHistory.findAll({
+  getDownloadHistory: (fileID) => (
+    /**
+     * This will get the full download history for a given file by File.id.
+     */
+    db.DownloadHistory.findAll({
       where: {fileID},
       attributes: ['ipAddress', 'createdAt', 'allowed']
     })
   ),
-  getOTP: async (fileID) => {
+
+  // add
+  addFile: ({filename, isPublic = false, size = null}) => (
+    /**
+     * This will create a file in the database. It will rely on the graphql filesystem
+     * synchronization middleware for the data to be accurate.
+     *
+     * The isPublic param should be based on the value of the defaultPermission config row.
+     * It should also be fine if the size is not specified at the time of file creation. The
+     * filesystem synchronization middleware will handle updating file sizes as needed.
+     */
+    db.File.create({filename, isPublic, size})
+  ),
+  addOTP: async (fileID) => {
+    /**
+     * This function will create an OTP for a given File.id. If the file does not exist,
+     * it will return null, causing a graphql schema error. The newly created OTP will
+     * not have a timeout specified, and will therefore be unlimited. To add a timeout
+     * to an OTP, use the webui.
+     */
     const otp = crypto.randomBytes(8).toString('hex');
     const file = await db.File.findOne({where: {id: fileID}});
+    if (!file)
+      return null;
     await db.OTP.create({otp, fileID});
     return {
       otp: `https://${DOMAIN}/f/${file.filename}?otp=${otp}`,
       rawOtp: otp,
     };
   },
-
-  // add
-  addFile: async ({filename, isPublic = false, size = null}) => (
-    await db.File.create({filename, isPublic, size})
-  ),
-  addUser: async (username, password) => (
-    await db.User.create({username, password: bcrypt.hashSync(password, 10)})
+  addUser: (username, password) => (
+    /**
+     * This adds a new User to the Users table.
+     */
+    db.User.create({username, password: bcrypt.hashSync(password, 10)})
   ),
   addConfig: (key, value) => (
-    db.Config.create({key, value, visible: true})
+    /**
+     * This adds a new config value to the Config table.
+     */
+    db.Config.create({key, value})
   ),
   addDownload: (fileID, ipAddress, allowed) => (
+    /**
+     * This will be called every time there a download is attempted.
+     * It adds a new DownloadHistory to the database.
+     */
     db.DownloadHistory.create({fileID, ipAddress, allowed})
   ),
 
   // delete
-  deleteFileByFilename: async ({filename}) => (
-    await db.File.destroy({where: {filename,}})
+  deleteFileByFilename: ({filename}) => (
+    /**
+     * This deletes a File row from the database by file.filename.
+     */
+    db.File.destroy({where: {filename,}})
   ),
-  deleteFileById: async (id) => (
-    await db.File.destroy({where: {id,}})
+  deleteFileById: id => (
+    /**
+     * This deletes a File row from the database by File.id.
+     */
+    db.File.destroy({where: {id,}})
   ),
 
   // update
   updateFile: async (file) => {
+    /**
+     * This will update a file row with new field information. These changes
+     * can be a filename change, or a isPublic change.
+     */
     await db.File.update({...file}, {where: {id: file.fileID}});
     return file;
   },

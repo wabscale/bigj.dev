@@ -8,7 +8,7 @@ const {
   addUser,
   updateFile,
   getDownloadHistory,
-  getOTP,
+  addOTP,
   getFileById,
   deleteFileById,
   addFile,
@@ -158,16 +158,16 @@ const resolvers = {
     me: requiresLogin((_, __, ctx) => ({username: ctx.state.user.username})),
     login: (_, {username, password}) => ({token: generateToken(username, password)}),
     fileHistory: requiresLogin((_, {fileID}) => transformDownloadHistory(getDownloadHistory(fileID))),
-    getOTP: requiresLogin((_, {fileID}) => getOTP(fileID)),
-    getAllConfig: requiresLogin(getAllVisibleConfig),
-    getConfig: requiresLogin((_, {key}) => getVisibleConfig(key))
+    getOTP: requiresLogin((_, {fileID}) => addOTP(fileID)),
+    getSettings: requiresLogin(getAllVisibleConfig),
+    getSetting: requiresLogin((_, {key}) => getVisibleConfig(key))
   },
   Mutation: {
     updateFile: requiresLogin((_, {fileID, filename, isPublic}) => handleFileUpdate({fileID, filename, isPublic})),
     // register: (_, {username, password}) => createUser(username, password),
     deleteFile: requiresLogin((_, {fileID}) => yeetFile(fileID)),
     singleUpload: requiresLogin((_, {file}) => handleUpload(file)),
-    updateConfig: requiresLogin((_, {keys, values}) => updateSettings(keys, values)),
+    updateSettings: requiresLogin((_, {keys, values}) => updateSettings(keys, values)),
     updateOTP: requiresLogin((_, {otp, timeout}) => updateOTP(otp, timeout))
   },
 };
