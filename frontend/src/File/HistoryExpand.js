@@ -37,13 +37,23 @@ class HistoryExpand extends React.Component {
   };
 
   render() {
-    const {classes, query, args, heading, reshape} = this.props;
-    const {expanded} = this.state;
+    const {
+      classes,
+      query,
+      args,
+      heading,
+      reshape
+    } = this.props;
+    const {
+      expanded
+    } = this.state;
 
     return (
       <ExpansionPanel onChange={() => this.setState({expanded: !expanded})}>
         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
-          <Typography className={classes.heading}>{heading}</Typography>
+          <Typography className={classes.heading}>
+            {heading}
+          </Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           {
@@ -58,7 +68,7 @@ class HistoryExpand extends React.Component {
                     <List className={classes.item}>
                       {reshape(data).map(({ip, time, allowed}) => (
                         <ListItem>
-                          <Tooltip title={`Download was ${allowed ? "" : "not"} allowed`}>
+                          <Tooltip title={`Download was${allowed ? " " : " not "}allowed`}>
                             <IconButton color={"secondary"}>
                               {allowed
                                 ? <DoneIcon color="primary"/>

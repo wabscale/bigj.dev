@@ -1,4 +1,12 @@
+// React
 import React, {Fragment, PureComponent} from 'react';
+import PropTypes from "prop-types";
+
+// Graphql
+import {Mutation, withApollo} from 'react-apollo';
+
+// material UI
+import {withStyles} from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Paper from '@material-ui/core/Paper';
@@ -6,22 +14,22 @@ import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
-import {withStyles} from '@material-ui/core/styles';
 import DeleteIcon from '@material-ui/icons/Delete';
 import SaveIcon from '@material-ui/icons/Save';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
-
 import Switch from '@material-ui/core/Switch';
 import Link from '@material-ui/core/Link';
-import PropTypes from "prop-types";
 import Grow from '@material-ui/core/Grow';
 import Typography from '@material-ui/core/Typography';
-import {Mutation, withApollo} from 'react-apollo';
-import {DELETE_FILE, GET_DOWNLOAD_HISTORY, GET_FILE_SIZE, UPDATE_FILE} from "../queries";
-import {humanSize} from "../utils";
+
+// Custom Components
 import FileExpand from './FileExpand';
 import HistoryExpand from "./HistoryExpand";
 import OTPExpand from "./OTPExpand";
+
+// Utils
+import {humanSize} from "../utils";
+import {DELETE_FILE, GET_DOWNLOAD_HISTORY, GET_FILE_SIZE, UPDATE_FILE} from "../queries";
 
 const styles = theme => ({
   paper: {
@@ -30,7 +38,7 @@ const styles = theme => ({
     overflow: 'hidden',
   },
   searchBar: {
-    borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+    // borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
   },
   searchInput: {
     fontSize: theme.typography.fontSize,
@@ -42,7 +50,7 @@ const styles = theme => ({
     marginRight: theme.spacing(1),
   },
   contentWrapper: {
-    margin: '40px 16px',
+    // margin: '40px 16px',
   },
   align: {
     display: 'flex',
@@ -58,26 +66,22 @@ class File extends PureComponent {
       ...props.file,
       display: true,
     };
-
-    this.togglePublic = this.togglePublic.bind(this);
-    this.update = this.update.bind(this);
-    // console.log(props.client);
   }
 
-  async update() {
+  update = async () => {
     const {fileID, filename, isPublic} = this.state;
     const {client} = this.props;
     await client.mutate({
       mutation: UPDATE_FILE,
       variables: {fileID, filename, isPublic},
     });
-  }
+  };
 
-  togglePublic() {
-    this.setState({
-      isPublic: !this.state.isPublic,
-    }, this.update);
-  }
+  togglePublic = () => {
+    this.setState(state => ({
+      isPublic: !state.isPublic,
+    }), this.update);
+  };
 
   render() {
     const {classes, index} = this.props;
@@ -119,7 +123,7 @@ class File extends PureComponent {
                     </Grid>
                     <Grid item key={`file_${fileID}_save`}>
                       <Tooltip title="Save">
-                        <IconButton color="default" onClick={() => this.update()}>
+                        <IconButton color="default" onClick={this.update}>
                           <SaveIcon
                             classes={{root: classes.block}}
                             color="inherit"
@@ -130,7 +134,7 @@ class File extends PureComponent {
                     <Grid item key={`file_${fileID}_download`}>
                       <Tooltip title="Download">
                         <IconButton href={
-                        `https://f.bigj.dev/f/${filename}`
+                          `https://f.bigj.dev/f/${filename}`
                         }>
                           <CloudDownloadIcon
                             classes={{root: classes.block}}
@@ -175,6 +179,10 @@ class File extends PureComponent {
                   query={GET_DOWNLOAD_HISTORY}
                   args={{fileID}}
                   reshape={data => data.fileHistory.slice(-10).map(({ipAddress, time, allowed}) => {
+                    /**
+                     * Get the most recent 10 downloads and return their ip address,
+                     * time (as an local time ISO string), and whether it was allowed or not.
+                     */
                     const datetime = new Date(0);
                     datetime.setUTCMilliseconds(time);
                     const trimmedIPAddress = ipAddress.substr(ipAddress.lastIndexOf(':') + 1);
@@ -182,7 +190,7 @@ class File extends PureComponent {
                       ip: trimmedIPAddress,
                       time: datetime.toLocaleString(),
                       allowed,
-                    }
+                    };
                   })}
                 />
                 <OTPExpand

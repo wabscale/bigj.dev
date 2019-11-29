@@ -24,7 +24,7 @@ const styles = theme => ({
   },
   item: {
     width: '100%',
-    maxWidth: 360,
+    // maxWidth: 360,
     backgroundColor: theme.palette.background.paper,
   },
   button: {
@@ -76,18 +76,11 @@ class OTPExpand extends React.Component {
                         <Link href={otp}>
                           {otp}
                         </Link>
-                        {/*<Tooltip title={otp}>*/}
-                        {/*  <IconButton color={"secondary"}>*/}
-                        {/*    <Link href={otp}>*/}
-                        {/*      <VpnKeyIcon color={'primary'}/>*/}
-                        {/*    </Link>*/}
-                        {/*  </IconButton>*/}
-                        {/*</Tooltip>*/}
                       </Grid>
                       <Grid item xs>
                         <Mutation mutation={UPDATE_OTP}>
                           {updateOtp => (
-                            <Fragment>;
+                            <Fragment>
                               <TextField
                                 id="outlined-name"
                                 label="Timeout"
