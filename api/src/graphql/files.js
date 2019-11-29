@@ -4,23 +4,35 @@ const {addFile, getFiles, deleteFileByFilename, getConfig} = require('../db');
 const {UPLOAD_PATH} = require('../config.js');
 
 function difference(setA, setB) {
+  /**
+   * This is a jank set difference.
+   */
   let _difference = new Set(setA);
-  for (let elem of setB) {
+  for (let elem of setB)
     _difference.delete(elem);
-  }
   return _difference;
 }
 
-truncateDecimals = function (number, digits) {
+truncateDecimals = (number, digits) => {
+  /**
+   * This function will truncate off a number so it only has n digits.
+   *
+   * example:
+   * truncateDecimals(1.123456789, 3) => 1.123
+   * @type {number}
+   */
   let multiplier = Math.pow(10, digits),
     adjustedNum = number * multiplier,
     truncatedNum = Math[adjustedNum < 0 ? 'ceil' : 'floor'](adjustedNum);
   return truncatedNum / multiplier;
 };
 
-getFileSize = (filename) => {
-  return fs.statSync(filename).size;
-};
+getFileSize = filename => (
+  /**
+   * This will get the size of a file on the filesystem by filename in bytes.
+   */
+  fs.statSync(filename).size
+);
 
 const update = async (ctx, next) => {
   /*
