@@ -3,12 +3,17 @@ import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
 import Switch from "@material-ui/core/Switch";
 import {Typography} from "@material-ui/core";
+import Tooltip from "@material-ui/core/Tooltip";
 
 const styles = theme => ({
   switch: {
     margin: theme.spacing(3),
   },
 });
+
+const tooltipTitle = {
+  'defaultPermission': value => value === 1 ? 'Public' : 'Private',
+};
 
 function BooleanConfig(props) {
   const {
@@ -24,14 +29,17 @@ function BooleanConfig(props) {
       component="h3"
     >
       {key}
-      <Switch
-        label={key}
-        checked={value === '1'}
-        className={classes.switch}
-        value={value}
-        color="primary"
-        onChange={onChange}
-      />
+      <Tooltip
+        title={tooltipTitle[key](value)}
+      >
+        <Switch
+          checked={value === '1'}
+          className={classes.switch}
+          value={value}
+          color="primary"
+          onChange={onChange}
+        />
+      </Tooltip>
     </Typography>
   );
 }

@@ -45,7 +45,7 @@ module.exports = {
     /**
      * This will get a Config row by Config.key.
      */
-    db.Config.findAll({where: {key,}})
+    db.Config.findOne({where: {key,}})
   ),
   getAllVisibleConfig: () => (
     /**
@@ -145,7 +145,7 @@ module.exports = {
     await db.File.update({...file}, {where: {id: file.fileID}});
     return file;
   },
-  updateSettings: async (keys, values) => {
+  updateConfig: async (keys, values) => {
     /*
     This function will take key, value arrays for settings, and update accordingly.
     For each mutable config key, there should be a corresponding validation

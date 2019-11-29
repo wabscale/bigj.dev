@@ -19,6 +19,7 @@ generateKey = async () => {
 
 loadKey = async () => {
   const key = await getConfig('siteKey');
+  console.log(key);
   return key ? key.value : await generateKey();
 };
 

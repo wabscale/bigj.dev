@@ -7,7 +7,7 @@ import Hidden from '@material-ui/core/Hidden';
 import {Query, withApollo} from "react-apollo";
 import Cookies from 'universal-cookie';
 import Navigator from './Navigator';
-import FileContent from './File/FileContent';
+import FileContent from './File/FileGrid';
 import LoginContent from './Login/LoginContent';
 import Header from './Header';
 import Upload from "./Upload/Upload";

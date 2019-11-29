@@ -115,7 +115,7 @@ class SearchBar extends PureComponent {
   }
 }
 
-class FileContent extends Component {
+class FileGrid extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -334,8 +334,8 @@ class FileContent extends Component {
   }
 }
 
-FileContent.propTypes = {
+FileGrid.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(withApollo(FileContent));
+export default withStyles(styles)(withApollo(FileGrid));
