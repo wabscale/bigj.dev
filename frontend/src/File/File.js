@@ -68,6 +68,10 @@ class File extends PureComponent {
     };
   }
 
+    /**
+     * This will save the state of the file through the api. It should only
+     * be called when the user clicks the save icon.
+     */
   update = async () => {
     const {fileID, filename, isPublic} = this.state;
     const {client} = this.props;
@@ -77,15 +81,24 @@ class File extends PureComponent {
     });
   };
 
-  togglePublic = () => {
+
+  /**
+   * Toggles the isPublic state, then updates the file in the api.
+   */
+  togglePublic = () => (
     this.setState(state => ({
       isPublic: !state.isPublic,
-    }), this.update);
-  };
+    }), this.update)
+  );
 
   render() {
     const {classes, index} = this.props;
-    const {fileID, filename, isPublic, display} = this.state;
+    const {
+      fileID,
+      filename,
+      isPublic,
+      display
+    } = this.state;
 
     return (
       <Grow
@@ -93,7 +106,6 @@ class File extends PureComponent {
         style={{transformOrigin: '0 0 0'}}
         timeout={(index + 1) * 150}
         key={`file_${fileID}_grow`}
-        // mountOnEnter
         unmountOnExit
       >
         <Grid item key={`file_${fileID}`} lg={4} md={4} sm={12}>
@@ -118,7 +130,9 @@ class File extends PureComponent {
                         onChange={event => this.setState({
                           filename: event.target.value,
                         })}
-                        onKeyPress={event => event.key === "Enter" ? this.update() : {}}
+                        onKeyPress={event => (
+                          event.key === "Enter" ? this.update() : null
+                        )}
                       />
                     </Grid>
                     <Grid item key={`file_${fileID}_save`}>
@@ -133,9 +147,7 @@ class File extends PureComponent {
                     </Grid>
                     <Grid item key={`file_${fileID}_download`}>
                       <Tooltip title="Download">
-                        <IconButton href={
-                          `https://f.bigj.dev/f/${filename}`
-                        }>
+                        <IconButton href={`${window.location}f/${filename}`}>
                           <CloudDownloadIcon
                             classes={{root: classes.block}}
                             color="inherit"
@@ -156,7 +168,7 @@ class File extends PureComponent {
                       <Mutation mutation={DELETE_FILE}>
                         {deleteFile => (
                           <Tooltip title="Delete">
-                            <IconButton onClick={async e => {
+                            <IconButton onClick={e => {
                               e.preventDefault();
                               deleteFile({
                                 variables: {fileID}

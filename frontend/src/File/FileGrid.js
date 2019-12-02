@@ -1,10 +1,23 @@
-import React, {Component, Fragment, PureComponent} from 'react';
+// React
+import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
+
+// React Scroll
+import {animateScroll} from "react-scroll";
+
+// Graphql
+import {Mutation, Query, withApollo} from 'react-apollo';
+
+// Fontawesome
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faFrown} from '@fortawesome/free-solid-svg-icons/faFrown';
+
+// Material UI
+import {withStyles} from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import {withStyles} from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import RefreshIcon from '@material-ui/icons/Refresh';
@@ -12,18 +25,17 @@ import FormControl from "@material-ui/core/FormControl";
 import IconButton from '@material-ui/core/IconButton';
 import Input from '@material-ui/core/Input';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import {Mutation, Query, withApollo} from 'react-apollo';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from '@material-ui/core/Typography';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faFrown} from '@fortawesome/free-solid-svg-icons/faFrown';
 import MobileStepper from '@material-ui/core/MobileStepper';
 import Button from '@material-ui/core/Button';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
-import {animateScroll} from "react-scroll";
 
+// Utils
 import {GET_FILES, UPLOAD_FILE} from '../queries';
+
+// Custom Components
 import File from './File';
 
 const styles = theme => ({
@@ -68,7 +80,7 @@ const styles = theme => ({
   },
 });
 
-class SearchBar extends PureComponent {
+class SearchBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -123,10 +135,7 @@ class FileGrid extends Component {
       files: [],
       activeStep: 0,
       fileCount: 0,
-      moving: false
     };
-    this.deleteFile = this.deleteFile.bind(this);
-    this.update = this.update.bind(this);
   }
 
   deleteFile = async ({fileID}) => {
@@ -170,8 +179,11 @@ class FileGrid extends Component {
 
   render() {
     const {classes, displayCount} = this.props;
-    const {searchTerm, activeStep, moving} = this.state;
-    const {fileCount} = this.state;
+    const {
+      fileCount,  // Count of files in loaded from api
+      searchTerm, // string for user provided search
+      activeStep, // A number between 0 and steps for current step page
+    } = this.state;
     const steps = Math.ceil(fileCount / displayCount);
 
     return (
@@ -233,38 +245,70 @@ class FileGrid extends Component {
             pollInterval={3000}
           >
             {({data, loading, error}) => {
-              if (loading || moving)
+              if (loading)
                 return (
                   <Grid item xs={12}>
                     <CircularProgress className={classes.progress}/>
                   </Grid>
                 );
-              if (error) {
-                return (
-                  <Fragment/>
-                );
-              }
+              if (error)
+                /**
+                 * This could be cause by a 500, or a unathorized request. In Paperbase.js,
+                 * we should be checking to make sure users are logged in, and yeeting them
+                 * to the login page if necessary.
+                 */
+                return null;
 
               if (data.files === undefined) {
-                return <div/>;
+                /**
+                 * The api fucked up if we reach this.
+                 */
+                return null;
               }
 
               const newFiles = data.files.map(
+                /**
+                 * Reshape data to fit components.
+                 *
+                 * @param fileID
+                 * @param filename
+                 * @param isPublic
+                 * @returns {{filename: string, isPublic: boolean, fileID: number}}
+                 */
                 ({fileID, filename, isPublic}) => ({fileID: parseInt(fileID), filename, isPublic})
               );
 
-              if (this.state.files.length === 0)
-                this.state.files = newFiles;
+              if (this.state.files.length === 0) {
+                /**
+                 * Avoid setting file state directly by forcing a re-render
+                 * when files are initially loaded.
+                 */
+                setTimeout(() => (
+                  this.setState({files: newFiles})
+                ), 100);
+                return null;
+              }
               const {files} = this.state;
 
+              /**
+               * Sort by time of creation.
+               * Newest will be at front of array.
+               */
               files.sort(
                 (a, b) => (a.fileID < b.fileID ? 1 : a.fileID > b.fileID ? -1 : 0)
               );
 
+              /**
+               * This should be where the searchTerm filtering is. It should do
+               * a simple regex on the filename.
+               */
               const displayFiles = files.filter(file => (
                 searchTerm.length === 0 || file.filename.toLowerCase().includes(searchTerm.toLowerCase())
               ));
 
+              /**
+               * This handles the case where a user searched for something that matches.
+               */
               if (displayFiles.length === 0)
                 return (
                   <Paper className={classes.paper}>
@@ -276,13 +320,13 @@ class FileGrid extends Component {
 
               setTimeout(() => this.setState({
                 fileCount: displayFiles.length,
-              }), 1000);
+              }), 100);
 
               return (
                 <Fragment>
                   {displayFiles.slice(
                     activeStep * displayCount,
-                    ((activeStep + 1) * displayCount)
+                    (activeStep + 1) * displayCount
                   ).map((file, index) => (
                     <File
                       key={`file_${file.fileID}_file`}
