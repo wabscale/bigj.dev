@@ -39,10 +39,10 @@ class HistoryExpand extends React.Component {
   render() {
     const {
       classes,
-      query,
-      args,
-      heading,
-      reshape
+      query,    // Graphql query
+      args,     // Graphql query args
+      heading,  // Heading text
+      reshape   // Function to reshape api response
     } = this.props;
     const {
       expanded

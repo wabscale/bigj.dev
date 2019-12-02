@@ -45,7 +45,7 @@ class OTPExpand extends React.Component {
   }
 
   render() {
-    const {classes, fileID, heading, reshape} = this.props;
+    const {classes, fileID, heading} = this.props;
     const {expanded} = this.state;
 
     return (

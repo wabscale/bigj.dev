@@ -11,8 +11,15 @@ const styles = theme => ({
   },
 });
 
+/**
+ * This object should be used to determine the title of the tooltip. The key should be
+ * the same as the config key. The value should be a lambda or function that takes the
+ * current value of the config and returns a string for the title of the tooltip.
+ *
+ * @type {{key: (function(value): string)}}
+ */
 const tooltipTitle = {
-  'defaultPermission': value => value === 1 ? 'Public' : 'Private',
+  'defaultPermission': value => value === '1' ? 'Public' : 'Private',
 };
 
 function BooleanConfig(props) {

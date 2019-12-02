@@ -27,7 +27,13 @@ class FileExpand extends React.Component {
   };
 
   render() {
-    const {classes, query, args, heading, reshape} = this.props;
+    const {
+      classes,
+      query,    // Graphql query
+      args,     // Graphql query args
+      heading,  // Heading text
+      reshape   // Function to reshape api response
+    } = this.props;
     const {expanded} = this.state;
 
     return (
@@ -43,7 +49,12 @@ class FileExpand extends React.Component {
                   if (loading)
                     return <CircularProgress className={classes.progress}/>;
                   if (error)
-                    return <Fragment/>;
+                    return null;
+
+                  /**
+                   * This will call the reshape function prop with the data from the query, and
+                   * puts each of the items in the returned array (string or jsx) in a grid.
+                   */
                   return (
                     <Grow
                       in={expanded}

@@ -1,6 +1,14 @@
+// React
 import React, {Component, Fragment} from 'react';
-import {ApolloConsumer, Query, withApollo} from "react-apollo";
 import PropTypes from 'prop-types';
+
+// Graphql
+import {ApolloConsumer, Query, withApollo} from "react-apollo";
+
+// Graphql queries
+import {GET_ALL_CONFIG, UPDATE_CONFIG} from '../queries';
+
+// Material UI
 import {withStyles} from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -10,7 +18,7 @@ import Typography from "@material-ui/core/Typography";
 import Chip from '@material-ui/core/Chip';
 import Grow from '@material-ui/core/Grow';
 
-import {GET_ALL_CONFIG, UPDATE_CONFIG} from '../queries';
+// Custom Components
 import StringConfig from "./StringConfig";
 import BooleanConfig from "./BooleanConfig";
 
@@ -60,16 +68,24 @@ class Settings extends Component {
       settingState: {},
       errors: null,
     };
-    this.allConfig = null;
   }
 
-  save = client => {
+  save = () => {
+    /**
+     * This function will handle saving all the visible config after
+     * a user clicks the save icon.
+     */
+
+    console.log('sanity')
+    const {client} = this.props;
     const {settingState} = this.state;
     client.mutate({
       mutation: UPDATE_CONFIG,
       variables: {
         keys: Object.keys(settingState),
-        values: Object.values(settingState)
+        values: Object.keys(settingState).map(key => (
+          settingState[key].value
+        )),
       },
       fetchPolicy: 'no-cache'
     }).then(({data}) => {
@@ -77,11 +93,18 @@ class Settings extends Component {
     });
   };
 
-  initSettingState = () => {
-    const {allConfig} = this;
+  initSettingState = allConfig => {
+    /**
+     * This will take the visible config response in the API, and saves
+     * it in the component state. Really this is mostly reshaping the
+     * response from the api.
+     */
     const {settingState} = this.state;
-    allConfig.forEach(({key, value}) => {
-      settingState[key] = value;
+    allConfig.forEach(({key, value, valueType}) => {
+      settingState[key] = {
+        value,
+        valueType
+      };
     });
     this.setState({settingState});
   };
@@ -109,16 +132,23 @@ class Settings extends Component {
                 </Grid>
               );
             if (error) {
-              setTimeout(() => switchView('Sign In'), 250);
-              return (
-                <Fragment/>
-              );
+              // Yeet user to login screen
+              setTimeout(() => (
+                switchView('Sign In')
+              ), 250);
+              return null;
             }
 
-            const allConfig = data.getAllConfig;
-            if (this.allConfig === null) {
-              this.allConfig = allConfig;
-              setTimeout(this.initSettingState, 100);
+            /**
+             * On the first time the data is requested from the api we will set the
+             * settingState here, through the initSettingState function. That function will
+             * call the this.setState function, so it will schedule a re-render on completion.
+             */
+            if (Object.keys(settingState).length === 0) {
+              const allConfig = data.getAllConfig;
+              setTimeout(() => (
+                this.initSettingState(allConfig)
+              ), 100);
               return null;
             }
 
@@ -150,12 +180,16 @@ class Settings extends Component {
                                         className={classes.paper}
                                         color="secondary"
                                         onDelete={() => this.setState(({errors}) => {
+                                          // This will take the error message out of the errors state.
                                           const copy = errors.filter(item => (
                                             item.message !== err.message
                                           ));
-                                          if (copy.length === 0) {
+
+                                          // If no errors left, then reset error state.
+                                          if (copy.length === 0)
                                             return {errors: null};
-                                          }
+
+                                          // schedule re-render without current error
                                           return {errors: copy};
                                         })}
                                       />
@@ -176,16 +210,19 @@ class Settings extends Component {
                             Settings
                           </Typography>
                         </Grid>
-                        {allConfig.map(({key, value, valueType}) => {
-
+                        {Object.keys(settingState).map(key => {
+                          const {value, valueType} = settingState[key];
                           switch (valueType) {
                             case 'string': return (
                                 <Grid item xs key={key}>
                                   <StringConfig
                                     label={key}
-                                    value={settingState[key]}
+                                    value={value}
                                     onChange={({target}) => this.setState(({settingState}) => {
-                                      settingState[key] = target.value;
+                                      settingState[key] = {
+                                        value: target.value,
+                                        valueType,
+                                      };
                                       return {settingState};
                                     })}
                                   />
@@ -195,9 +232,12 @@ class Settings extends Component {
                                 <Grid item xs key={key}>
                                   <BooleanConfig
                                     label={key}
-                                    value={settingState[key]}
+                                    value={value}
                                     onChange={() => this.setState(({settingState}) => {
-                                      settingState[key] = settingState[key] === '1' ? '0' : '1';
+                                      settingState[key] = {
+                                        value: settingState[key].value === '1' ? '0' : '1',
+                                        valueType,
+                                      };
                                       return {settingState};
                                     })}
                                   />
