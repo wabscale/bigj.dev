@@ -20,21 +20,27 @@ import {WHOAMI} from "./queries";
  * @returns {*}
  * @constructor
  */
-const Auth = ({children, clearAuth, switchView}) => {
+const Auth = ({children, clearAuth, switchView, active}) => {
   return (
     <Query
       query={WHOAMI}
-      fetchPolicy={'no-cache'}
+      fetchPolicy={'network-only'}
     >
       {({data, error, loading}) => {
         if (loading)
           return null;
-        if (error || !data.me.username) {
-          clearAuth(); // yeet user
-          setTimeout(() => ( // delay to avoid recursive re-render
-            switchView('Sign In')
-          ), 100);
-          return null;
+
+        /**
+         * If the active view is Sign In, we should ignore any errors.
+         */
+        if (active !== 'Sign In') {
+          if (error || !(data.me && data.me.username)) {
+            clearAuth(); // yeet user
+            setTimeout(() => ( // delay to avoid recursive re-render
+              switchView('Sign In')
+            ), 100);
+            return null;
+          }
         }
 
         /**
