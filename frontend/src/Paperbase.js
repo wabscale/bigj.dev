@@ -78,6 +78,7 @@ const Main = props => {
 
   return (
     <Auth
+      active={active}
       clearAuth={clearAuth}
       switchView={switchView}
     >
