@@ -90,7 +90,7 @@ class LoginContent extends React.PureComponent {
         cookies.remove('token');
       }
       cookies.set('token', token);
-      switchView("View");
+      setTimeout(() => switchView("View"), 100);
     }).catch(e => {
       console.log(e);
       this.setState({hasAttemptedLogin: true});
