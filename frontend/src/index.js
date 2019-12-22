@@ -27,7 +27,7 @@ const defaultOptions = {
 
 const client = new ApolloClient({
   link: createUploadLink({
-    uri: 'https://f.bigj.dev/graphql',
+    uri: '/graphql',
     credentials: 'same-origin',
     fetch: authFetch,
   }),
