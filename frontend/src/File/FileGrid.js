@@ -342,7 +342,7 @@ class FileGrid extends Component {
           <Grid item xs={12}>
             <MobileStepper
               variant="dots"
-              steps={steps}
+              steps={steps < 10 ? steps : 10}
               position="bottom"
               activeStep={this.state.activeStep}
               className={classes.stepper}
