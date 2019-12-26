@@ -11,6 +11,7 @@ import {ApolloConsumer} from 'react-apollo';
 import Chip from '@material-ui/core/Chip';
 import Grow from '@material-ui/core/Grow';
 import Cookies from 'universal-cookie';
+import {Redirect} from "react-router-dom/";
 
 const styles = theme => ({
   container: {
@@ -63,64 +64,96 @@ const styles = theme => ({
   }
 });
 
+
+/**
+ * This function will return a rendered chip warning if
+ * hasAttemptedLogin is true.
+ *
+ * @param hasAttemptedLogin
+ * @returns {*}
+ * @constructor
+ */
+const DisplayWarning = hasAttemptedLogin => (
+  <Fragment>
+    {hasAttemptedLogin ? (
+      <Grow
+        in={hasAttemptedLogin}
+        timeout={250}
+        unmountOnExit
+      >
+        <Grid item key="alert">
+          <Chip
+            label="Invalid Credentials"
+            color="secondary"
+            onDelete={() => this.setState({hasAttemptedLogin: false})}
+          />
+        </Grid>
+      </Grow>
+    ) : <Fragment/>}
+  </Fragment>
+);
+
 class LoginContent extends React.PureComponent {
   constructor(props) {
     super(props);
+    const cookies = new Cookies();
     this.state = {
       username: '',
       password: '',
       hasAttemptedLogin: false,
+      loggedIn: cookies.get('token'),
     };
-    this.login = this.login.bind(this);
   }
 
-  login(client) {
+  /**
+   * This will send the entered creds to the api, and
+   * request a token.
+   *
+   * Upon success, it will set the loggedIn state to true.
+   * This will trigger a re-render which will return a
+   * redirect to the main file view page.
+   *
+   * Upon an unsuccessful request, it will display a warning chip
+   * to the user.
+   *
+   * @param client - graphql client
+   */
+  login = client => {
     const {username, password} = this.state;
-    const {switchView} = this.props;
     const cookies = new Cookies();
     client.query({
       query: LOGIN,
       variables: {username, password},
       fetchPolicy: 'no-cache',
     }).then(({data}) => {
-      client.resetStore(); // yeet cache
       const {token} = data.login;
       if (cookies.get('token')) {
         // If cookie already exists, clear it.
         cookies.remove('token');
       }
       cookies.set('token', token);
-      setTimeout(() => switchView("View"), 100);
+      this.setState({loggedIn: true});
     }).catch(e => {
       console.log(e);
       this.setState({hasAttemptedLogin: true});
     });
-  }
+  };
 
   render() {
     const {classes} = this.props;
-    const {username, password, hasAttemptedLogin} = this.state;
+    const {
+      username,
+      password,
+      hasAttemptedLogin,
+      loggedIn,
+    } = this.state;
+
+    if (loggedIn)
+      return <Redirect to="/view"/>;
 
     return (
       <Grid container spacing={3} alignItems="center" justify="center" direction="column">
-        {
-          hasAttemptedLogin ? (
-            <Grow
-              in={hasAttemptedLogin}
-              timeout={250}
-              unmountOnExit
-            >
-              <Grid item key="alert">
-                <Chip
-                  label="Invalid Credentials"
-                  className={classes.paper}
-                  color="secondary"
-                  onDelete={() => this.setState({hasAttemptedLogin: false})}
-                />
-              </Grid>
-            </Grow>
-          ) : <Fragment/>
-        }
+        {DisplayWarning(hasAttemptedLogin)}
         <Grid item key="form">
           <ApolloConsumer>
             {client => (

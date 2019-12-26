@@ -5,22 +5,24 @@ import React, {Fragment} from 'react';
 import {Query} from "react-apollo";
 import {WHOAMI} from "./queries";
 
+// User imports
+import {clearAuth} from "./utils";
+import ComponentTree from "./ComponentTree";
+
 /**
- * This component is an unauthentication wrapper component.
+ * This component should be used to
  * What that means is that you can wrap any components in
  * this and they will only be accessible after authentication
  * through the graphql api.
  *
  * eg:
- * <Auth> ... </Auth>
+ * <WrapAuth> ... </WrapAuth>
  *
  * @param children
- * @param clearAuth
- * @param switchView
  * @returns {*}
  * @constructor
  */
-const Auth = ({children, clearAuth, switchView, active}) => {
+const Auth = ({children}) => {
   return (
     <Query
       query={WHOAMI}
@@ -30,16 +32,15 @@ const Auth = ({children, clearAuth, switchView, active}) => {
         if (loading)
           return null;
 
+        const component = ComponentTree.find(item => item.path === window.location.pathname);
+
         /**
          * If the active view is Sign In, we should ignore any errors.
          */
-        if (active !== 'Sign In') {
+        if (component && component.auth) {
           if (error || !(data.me && data.me.username)) {
-            clearAuth(); // yeet user
-            setTimeout(() => ( // delay to avoid recursive re-render
-              switchView('Sign In')
-            ), 100);
-            return null;
+            console.log(component, error, data)
+            return clearAuth();
           }
         }
 
@@ -56,4 +57,25 @@ const Auth = ({children, clearAuth, switchView, active}) => {
   )
 };
 
-export default Auth;
+/**
+ * This function will take a rendered component, and wrap it
+ * in the WrapAuth component if apply is true. If apply is false,
+ * it will just return the component.
+ * @param component
+ * @param apply
+ * @returns {*}
+ * @constructor
+ */
+const WrapAuth = (component, apply) => {
+  return apply ? (
+    <Auth>
+      {component}
+    </Auth>
+  ) : (
+    <Fragment>
+      {component}
+    </Fragment>
+  );
+};
+
+export default WrapAuth;
