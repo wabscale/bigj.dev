@@ -17,22 +17,43 @@ import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import SettingsIcon from '@material-ui/icons/Settings';
+import {Link} from "react-router-dom";
 
 
 const categories = [
   {
     id: 'Files',
     children: [
-      {id: 'View', icon: <FolderIcon/>},
-      {id: 'Upload', icon: <CloudUploadIcon/>},
-      {id: 'Settings', icon: <SettingsIcon/>}
+      {
+        id: 'View',
+        icon: <FolderIcon/>,
+        path: '/view'
+      },
+      {
+        id: 'Upload',
+        icon: <CloudUploadIcon/>,
+        path: '/upload'
+      },
+      {
+        id: 'Settings',
+        icon: <SettingsIcon/>,
+        path: '/settings'
+      }
     ],
   },
   {
     id: "Auth",
     children: [
-      {id: "Sign In", icon: <FontAwesomeIcon icon={faSignInAlt} />},
-      {id: 'Sign Out', icon: <FontAwesomeIcon icon={faSignOutAlt}/>}
+      {
+        id: "Sign In",
+        icon: <FontAwesomeIcon icon={faSignInAlt} />,
+        path: '/signin'
+      },
+      {
+        id: 'Sign Out',
+        icon: <FontAwesomeIcon icon={faSignOutAlt}/>,
+        path: '/signout'
+      }
     ],
   }
 ];
@@ -54,7 +75,11 @@ const styles = theme => ({
   item: {
     paddingTop: 4,
     paddingBottom: 4,
-    color: 'rgba(255, 255, 255, 0.7)',
+    // color: 'rgba(255, 255, 255, 0.7)',
+    '&:hover': {
+      backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    },
+    color: '#4fc3f7',
   },
   itemCategory: {
     backgroundColor: '#232f3e',
@@ -84,8 +109,8 @@ const styles = theme => ({
   },
 });
 
-function Navigator(props) {
-  const {classes, onDrawerToggle, switchView, api, ...other} = props;
+const Navigator = props => {
+  const {classes, onDrawerToggle, api, ...other} = props;
 
   return (
     <Drawer variant="permanent" {...other} onClose={onDrawerToggle} className={classes.root}>
@@ -124,23 +149,23 @@ function Navigator(props) {
                 {id}
               </ListItemText>
             </ListItem>
-            {children.map(({id: childId, icon}) => (
+            {children.map(({id: childId, icon, path}) => (
               <ListItem
                 button
                 dense
                 key={childId}
-                selected={props.active.toLowerCase() === childId.toLowerCase()}
-                className={classNames(
-                  classes.item,
-                  classes.itemActionable,
-                  props.active && classes.itemActiveItem,
-                )}
+                selected={path === window.location.pathname}
+                className={classes.item}
                 onClick={() => {
-                  switchView(childId);
                   onDrawerToggle();
                 }}
+                component={Link}
+                to={path}
               >
-                <ListItemIcon>{icon}</ListItemIcon>
+                <ListItemIcon
+                >
+                  {icon}
+                </ListItemIcon>
                 <ListItemText
                   classes={{
                     primary: classes.itemPrimary,
