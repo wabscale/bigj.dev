@@ -147,7 +147,7 @@ class File extends PureComponent {
                     </Grid>
                     <Grid item key={`file_${fileID}_download`}>
                       <Tooltip title="Download">
-                        <IconButton href={`${window.location}f/${filename}`}>
+                        <IconButton href={`/f/${filename}`}>
                           <CloudDownloadIcon
                             classes={{root: classes.block}}
                             color="inherit"
