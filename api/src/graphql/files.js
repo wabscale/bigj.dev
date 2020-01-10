@@ -69,13 +69,13 @@ const update = async (ctx, next) => {
     newFiles.forEach(filename => addFile({
       filename,
       isPublic,
-      size: getFileSize(`${UPLOAD_PATH}/${filename}`),
+      size: getFileSize(`${UPLOAD_PATH}/${filename}`).toString(),
     }));
 
     let files = await getFiles();
     files.forEach(file => {
       // Record size of file (in bytes) for each row.
-      file.size = getFileSize(`${UPLOAD_PATH}/${file.filename}`);
+      file.size = getFileSize(`${UPLOAD_PATH}/${file.filename}`).toString();
 
       // This save will only run an update query if the value of size was changed.
       file.save();
