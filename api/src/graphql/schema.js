@@ -61,7 +61,7 @@ const typeDefs = gql`
     fileID: ID!
     filename: String!
     isPublic: Boolean
-    size: Int
+    size: String
   }
   
   type FileHistory {
